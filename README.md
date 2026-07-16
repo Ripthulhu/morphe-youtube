@@ -35,18 +35,19 @@ All modifications made by Morphe, along with their dates, can be found in the Gi
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v1.32.0](https://github.com/MorpheApp/morphe-patches/releases/tag/v1.32.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;115 patches total
+> **[v1.33.0](https://github.com/Ripthulhu/morphe-youtube/releases/tag/v1.33.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;116 patches total
 <details>
-<summary>📦 YouTube&nbsp;&nbsp;•&nbsp;&nbsp;70 patches</summary>
+<summary>📦 YouTube&nbsp;&nbsp;•&nbsp;&nbsp;71 patches</summary>
 <br>
 
 **🎯 Supported versions:**
 
-| 🧪&nbsp;21.25.523 | 🧪&nbsp;21.24.360 | 🧪&nbsp;21.23.480 | 🧪&nbsp;21.05.265 | 20.51.39 | 20.31.42 | 20.21.37 |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 🧪&nbsp;21.25.523 | 🧪&nbsp;21.24.360 | 🧪&nbsp;21.23.480 | 🧪&nbsp;21.05.265 | 21.04.223 | 20.51.39 | 20.31.42 | 20.21.37 |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [AI playback API](#ai-playback-api) | Adds an explicit search-and-play API that opens videos in YouTube's normal player. |  |
 | [Alternative thumbnails](#alternative-thumbnails) | Adds options to replace video thumbnails using the DeArrow API or image captures from the video. |  |
 | [Ambient mode](#ambient-mode) | Adds options to bypass power saving restrictions for Ambient mode and disable it entirely or in fullscreen. |  |
 | [Bypass image region restrictions](#bypass-image-region-restrictions) | Adds an option to use a different host for user avatar and channel images and can fix missing images that are blocked in some countries. |  |
