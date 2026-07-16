@@ -35,7 +35,48 @@ All modifications made by Morphe, along with their dates, can be found in the Gi
 ## 🩹 Patches list
 
 <!-- PATCHES_START -->
-> **[v1.33.1](https://github.com/Ripthulhu/morphe-youtube/releases/tag/v1.33.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;116 patches total
+> **[v1.34.0](https://github.com/Ripthulhu/morphe-youtube/releases/tag/v1.34.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;117 patches total
+<details>
+<summary>📦 YouTube Music&nbsp;&nbsp;•&nbsp;&nbsp;27 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 🧪&nbsp;9.24.51 | 🧪&nbsp;9.23.52 | 🧪&nbsp;9.22.53 | 9.15.51 | 8.51.51 | 7.29.52 |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [AI playback API](#ai-playback-api) | Adds a Symfonium-compatible search, playback, and media-control API. |  |
+| [Bypass certificate checks](#bypass-certificate-checks) | Bypasses certificate checks which prevent YouTube Music from working on Android Auto. |  |
+| [Change header](#change-header) | Adds an option to change the header logo in the top left corner of the app. | • Custom header logo |
+| [Change miniplayer color](#change-miniplayer-color) | Adds an option to change the miniplayer background color to match the fullscreen player. |  |
+| [Change start page](#change-start-page) | Adds an option to set which page the app opens in instead of the homepage. |  |
+| [Check watch history domain name resolution](#check-watch-history-domain-name-resolution) | Checks if the device DNS server is preventing user watch history from being saved. |  |
+| [Custom branding](#custom-branding) | Adds options to change the app icon and app name. Branding cannot be changed for mounted (root) installations. | • App name<br>• Custom icon |
+| [Disable DRC audio](#disable-drc-audio) | Adds an option to disable DRC (Dynamic Range Compression) audio. |  |
+| [Disable QUIC protocol](#disable-quic-protocol) | Adds an option to disable QUIC (Quick UDP Internet Connections) network protocol. |  |
+| [Enable debugging](#enable-debugging) | Adds options for debugging and exporting Morphe logs to the clipboard. |  |
+| [Enable exclusive audio playback](#enable-exclusive-audio-playback) | Enables the option to play audio without video. |  |
+| [Enable forced miniplayer](#enable-forced-miniplayer) | Adds an option to enable forced miniplayer when switching between music videos, podcasts, or songs. |  |
+| [Enable swipe to dismiss miniplayer](#enable-swipe-to-dismiss-miniplayer) | Adds an option to enable dismissing the miniplayer by swiping down on it. |  |
+| [Force original audio](#force-original-audio) | Adds an option to always use the original audio track. |  |
+| [GmsCore support](#gmscore-support) | Allows the app to work without root by using a different package name when patched using a GmsCore instead of Google Play Services. |  |
+| [Hide ads](#hide-ads) | Adds options to hide ads such as the fullscreen Premium popup and "Get Music Premium" label. |  |
+| [Hide buttons](#hide-buttons) | Adds options to hide the cast, history, notification, and search buttons. |  |
+| [Hide category bar](#hide-category-bar) | Adds an option to hide the category bar at the top of the homepage. |  |
+| [Hide music video ads](#hide-music-video-ads) | Adds an option to hide ads that appear while listening to or streaming music videos, podcasts, or songs. |  |
+| [Miniplayer previous and next buttons](#miniplayer-previous-and-next-buttons) | Adds options to show previous and next track buttons in the miniplayer. |  |
+| [Navigation bar](#navigation-bar) | Adds options to hide navigation bar, labels and buttons. |  |
+| [Permanent repeat](#permanent-repeat) | Adds an option to always repeat even if the playlist ends or another track is played. |  |
+| [Remove background playback restrictions](#remove-background-playback-restrictions) | Removes restrictions on background playback, including playing kids videos in the background. |  |
+| [Sanitize sharing links](#sanitize-sharing-links) | Removes the tracking query parameters from shared links. |  |
+| [Spoof video streams](#spoof-video-streams) | Adds options to spoof the client video streams to fix playback. |  |
+| [Theme](#theme) | Adds options for theming and applies a custom background theme (dark background theme defaults to pure black). | • Dark theme background color |
+| [Track crossfade](#track-crossfade) | Adds a true dual-player crossfade between consecutive tracks. Requires YouTube Music 9.00 or newer; on older versions the patch is a no-op. |  |
+
+</details>
+
 <details>
 <summary>📦 YouTube&nbsp;&nbsp;•&nbsp;&nbsp;71 patches</summary>
 <br>
@@ -118,46 +159,6 @@ All modifications made by Morphe, along with their dates, can be found in the Gi
 | [Theme](#theme) | Adds options for theming and applies a custom background theme (dark background theme defaults to pure black). | • Dark theme background color<br>• Light theme background color |
 | [Video ads](#video-ads) | Adds an option to remove ads in the video player. |  |
 | [Video quality](#video-quality) | Adds options to set default video qualities and always use the advanced video quality menu. |  |
-
-</details>
-
-<details>
-<summary>📦 YouTube Music&nbsp;&nbsp;•&nbsp;&nbsp;26 patches</summary>
-<br>
-
-**🎯 Supported versions:**
-
-| 🧪&nbsp;9.24.51 | 🧪&nbsp;9.23.52 | 🧪&nbsp;9.22.53 | 9.15.51 | 8.51.51 | 7.29.52 |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-
-| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
-|----------|----------------|-----------|
-| [Bypass certificate checks](#bypass-certificate-checks) | Bypasses certificate checks which prevent YouTube Music from working on Android Auto. |  |
-| [Change header](#change-header) | Adds an option to change the header logo in the top left corner of the app. | • Custom header logo |
-| [Change miniplayer color](#change-miniplayer-color) | Adds an option to change the miniplayer background color to match the fullscreen player. |  |
-| [Change start page](#change-start-page) | Adds an option to set which page the app opens in instead of the homepage. |  |
-| [Check watch history domain name resolution](#check-watch-history-domain-name-resolution) | Checks if the device DNS server is preventing user watch history from being saved. |  |
-| [Custom branding](#custom-branding) | Adds options to change the app icon and app name. Branding cannot be changed for mounted (root) installations. | • App name<br>• Custom icon |
-| [Disable DRC audio](#disable-drc-audio) | Adds an option to disable DRC (Dynamic Range Compression) audio. |  |
-| [Disable QUIC protocol](#disable-quic-protocol) | Adds an option to disable QUIC (Quick UDP Internet Connections) network protocol. |  |
-| [Enable debugging](#enable-debugging) | Adds options for debugging and exporting Morphe logs to the clipboard. |  |
-| [Enable exclusive audio playback](#enable-exclusive-audio-playback) | Enables the option to play audio without video. |  |
-| [Enable forced miniplayer](#enable-forced-miniplayer) | Adds an option to enable forced miniplayer when switching between music videos, podcasts, or songs. |  |
-| [Enable swipe to dismiss miniplayer](#enable-swipe-to-dismiss-miniplayer) | Adds an option to enable dismissing the miniplayer by swiping down on it. |  |
-| [Force original audio](#force-original-audio) | Adds an option to always use the original audio track. |  |
-| [GmsCore support](#gmscore-support) | Allows the app to work without root by using a different package name when patched using a GmsCore instead of Google Play Services. |  |
-| [Hide ads](#hide-ads) | Adds options to hide ads such as the fullscreen Premium popup and "Get Music Premium" label. |  |
-| [Hide buttons](#hide-buttons) | Adds options to hide the cast, history, notification, and search buttons. |  |
-| [Hide category bar](#hide-category-bar) | Adds an option to hide the category bar at the top of the homepage. |  |
-| [Hide music video ads](#hide-music-video-ads) | Adds an option to hide ads that appear while listening to or streaming music videos, podcasts, or songs. |  |
-| [Miniplayer previous and next buttons](#miniplayer-previous-and-next-buttons) | Adds options to show previous and next track buttons in the miniplayer. |  |
-| [Navigation bar](#navigation-bar) | Adds options to hide navigation bar, labels and buttons. |  |
-| [Permanent repeat](#permanent-repeat) | Adds an option to always repeat even if the playlist ends or another track is played. |  |
-| [Remove background playback restrictions](#remove-background-playback-restrictions) | Removes restrictions on background playback, including playing kids videos in the background. |  |
-| [Sanitize sharing links](#sanitize-sharing-links) | Removes the tracking query parameters from shared links. |  |
-| [Spoof video streams](#spoof-video-streams) | Adds options to spoof the client video streams to fix playback. |  |
-| [Theme](#theme) | Adds options for theming and applies a custom background theme (dark background theme defaults to pure black). | • Dark theme background color |
-| [Track crossfade](#track-crossfade) | Adds a true dual-player crossfade between consecutive tracks. Requires YouTube Music 9.00 or newer; on older versions the patch is a no-op. |  |
 
 </details>
 

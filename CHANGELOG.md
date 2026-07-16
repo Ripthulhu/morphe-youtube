@@ -1,3 +1,9 @@
+## [1.34.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.33.1...v1.34.0) (2026-07-16)
+
+### ✨ New Features
+
+* release YouTube Music AI playback API ([7b72b7f](https://github.com/Ripthulhu/morphe-youtube/commit/7b72b7fcc61c46741034406e70c68bcb9d7f56c8))
+
 ## [1.33.1](https://github.com/Ripthulhu/morphe-youtube/compare/v1.33.0...v1.33.1) (2026-07-16)
 
 ### 🐛 Bug Fixes
