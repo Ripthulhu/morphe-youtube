@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-16T12:18:50",
-  "description": "## [1.33.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.32.0...v1.33.0) (2026-07-16)\n\n### ✨ New Features\n\n* add YouTube AI playback API ([821f355](https://github.com/Ripthulhu/morphe-youtube/commit/821f355e66f4108fe3ef4bd37eb8cffa8a27ce1e))",
-  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.33.0/patches-1.33.0.mpp",
+  "created_at": "2026-07-16T13:39:50",
+  "description": "## [1.33.1](https://github.com/Ripthulhu/morphe-youtube/compare/v1.33.0...v1.33.1) (2026-07-16)\n\n### 🐛 Bug Fixes\n\n* return YouTube control results safely ([b1ba234](https://github.com/Ripthulhu/morphe-youtube/commit/b1ba234a906e84c4b248ac9f5abadc9449684a0a))",
+  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.33.1/patches-1.33.1.mpp",
   "signature_download_url": "",
-  "version": "1.33.0"
+  "version": "1.33.1"
 }

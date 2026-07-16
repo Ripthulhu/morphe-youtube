@@ -1,3 +1,9 @@
+## [1.33.1](https://github.com/Ripthulhu/morphe-youtube/compare/v1.33.0...v1.33.1) (2026-07-16)
+
+### 🐛 Bug Fixes
+
+* return YouTube control results safely ([b1ba234](https://github.com/Ripthulhu/morphe-youtube/commit/b1ba234a906e84c4b248ac9f5abadc9449684a0a))
+
 ## [1.33.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.32.0...v1.33.0) (2026-07-16)
 
 ### ✨ New Features
