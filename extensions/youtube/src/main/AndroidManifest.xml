@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application>
+        <receiver
+            android:name="app.morphe.extension.youtube.patches.YouTubeControlReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="app.morphe.youtube.api.MEDIA_START" />
+            </intent-filter>
+        </receiver>
+    </application>
 </manifest>

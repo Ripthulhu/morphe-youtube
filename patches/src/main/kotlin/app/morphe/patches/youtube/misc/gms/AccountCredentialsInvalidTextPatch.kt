@@ -5,6 +5,8 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patches.youtube.misc.extension.sharedExtensionPatch
+import app.morphe.patches.youtube.misc.playservice.is_21_05_or_greater
+import app.morphe.patches.youtube.misc.playservice.versionCheckPatch
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 private const val EXTENSION_CLASS =
@@ -12,9 +14,16 @@ private const val EXTENSION_CLASS =
 
 internal val accountCredentialsInvalidTextPatch = bytecodePatch {
 
-    dependsOn(sharedExtensionPatch)
+    dependsOn(
+        sharedExtensionPatch,
+        versionCheckPatch,
+    )
 
     execute {
+        // The resource used by this optional error-message improvement does
+        // not exist in 21.04 and older builds.
+        if (!is_21_05_or_greater) return@execute
+
         // If the user recently changed their account password,
         // the app can show "You're offline. Check your internet connection."
         // even when the internet is available. For this situation

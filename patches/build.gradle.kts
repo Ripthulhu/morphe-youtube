@@ -2,10 +2,10 @@ group = "app.morphe"
 
 patches {
     about {
-        name = "Morphe Patches"
-        description = "Patches for Morphe"
-        source = "git@github.com:MorpheApp/morphe-patches.git"
-        author = "MorpheApp"
+        name = "Morphe YouTube"
+        description = "YouTube patches for Morphe"
+        source = "https://github.com/Ripthulhu/morphe-youtube.git"
+        author = "Ripthulhu"
         contact = "na"
         website = "https://morphe.software"
         license = "GNU General Public License v3.0, with additional GPL section 7 requirements"
