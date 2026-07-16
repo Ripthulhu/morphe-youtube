@@ -20,6 +20,18 @@ Second \"item\" text"</string>
   <string name="morphe_restart_first_run">Tənzimləməni bitirmək üçün yenidən başlat</string>
   <!-- layout.branding.baseCustomBrandingPatch -->
   <string name="morphe_custom_branding_name_title">Tətbiq adı</string>
+  <!-- interaction.downloads.downloadsPatch -->
+  <string name="morphe_external_downloader_screen_title">Xarici yükləmələr</string>
+  <string name="morphe_external_downloader_name_title">Yükləyici paketi adı</string>
+  <string name="morphe_external_downloader_name_summary">Quraşdırılan xarici yükləyici tətbiqinizin paket adı</string>
+  <string name="morphe_external_downloader_other_item_hint">Paket adını qeyd et</string>
+  <string name="morphe_external_downloader_other_item">Digər</string>
+  <string name="morphe_external_downloader_not_found_title">Tətbiq quraşdırılmayıb</string>
+  <string name="morphe_external_downloader_not_installed_warning">%s quraşdırılmayıb. Xahiş olunur, onu quraşdır.</string>
+  <string name="morphe_external_downloader_package_not_found_warning">"Paket adı: %s ilə quraşdırılmış tətbiq tapılmadı
+
+Paket adının düzgün olduğunu və tətbiqin quraşdırıldığını yoxla"</string>
+  <string name="morphe_external_downloader_empty_warning">Paket adı boş ola bilməz</string>
   <!-- Translations of this should be identical to morphe_custom_branding_icon_entry_7 -->
   <string name="morphe_custom_branding_name_entry_5">Fərdi</string>
   <string name="morphe_custom_branding_icon_title">Tətbiq simvolu</string>
@@ -40,7 +52,7 @@ Second \"item\" text"</string>
   <string name="morphe_check_watch_history_domain_name_dialog_title">Morphe Bildirişi</string>
   <string name="morphe_check_watch_history_domain_name_dialog_message">Baxış tarixçəniz saxlanılmır.&lt;br&gt;&lt;br&gt;Bu çox güman ki, DNS reklam əngəlləyici və ya şəbəkə proksisinə görədir.&lt;br&gt;&lt;br&gt;Bunu düzəltmək üçün s.youtube.com-u&lt;/b&gt; &lt;b&gt;ağ siyahıya salın və ya bütün DNS əngəlləyiciləri və proksiləri bağlayın.</string>
   <string name="morphe_check_watch_history_domain_name_dialog_ignore">Təkrar göstərmə</string>
-  <!-- misc.fix.playback.spoofVideoStreamsPatch -->
+  <!-- misc.spoof.spoofVideoStreamsPatch -->
   <string name="morphe_spoof_video_streams_screen_title">Video yayımların saxtalaşdır</string>
   <string name="morphe_spoof_video_streams_screen_summary">Oynatma problemlərin önləmək üçün qəbuledici saxtakarlığını tənzimlə</string>
   <string name="morphe_spoof_video_streams_title">Video yayımların saxtalaşdır</string>
@@ -109,6 +121,25 @@ Oynadıcı JavaScript hash-i köhnədirsə, oynatma uğursuz olacaq."</string>
   <!-- misc.audio.tracks.forceOriginalAudioPatch -->
   <string name="morphe_force_original_audio_title">Orijinal səs dilini zorla</string>
   <string name="morphe_force_original_audio_summary">Həmişə videonun dublyaj olunan versiyası əvəzinə əsil audio trekini oynadır</string>
+  <!-- misc.proxy.networkProxyPatch -->
+  <string name="morphe_proxy_screen_title">Şəbəkə proksisi</string>
+  <string name="morphe_proxy_screen_summary">Dəstəklənən şəbəkə sorğularını proksi vasitəsilə yönləndir</string>
+  <string name="morphe_proxy_enabled_title">Proksini aktivləşdir</string>
+  <string name="morphe_proxy_enabled_summary">Dəstəklənən şəbəkə sorğularını konfiqurasiya olunmuş HTTP və ya HTTPS proksi vasitəsilə yönləndirir</string>
+  <string name="morphe_proxy_host_title">Proksi host</string>
+  <string name="morphe_proxy_host_summary">Proksi serverin host adı və ya IP ünvanı</string>
+  <string name="morphe_proxy_port_title">Proksi portu</string>
+  <string name="morphe_proxy_port_summary">Proksi serverin portu</string>
+  <string name="morphe_proxy_https_title">HTTPS proksi istifadə et</string>
+  <string name="morphe_proxy_https_summary">HTTP əvəzinə proksi serverə qoşulmaq üçün HTTPS istifadə et</string>
+  <string name="morphe_proxy_auth_enabled_title">Proksi təsdiqlənməsi</string>
+  <string name="morphe_proxy_auth_enabled_summary">Proksi sorğuları ilə əsas təsdiqlənməni göndərir</string>
+  <string name="morphe_proxy_auth_username_title">Proksi istifadəçi adı</string>
+  <string name="morphe_proxy_auth_username_summary">Əsas proksi təsdiqlənməsi üçün istifadəçi adı</string>
+  <string name="morphe_proxy_auth_password_title">Proksi parolu</string>
+  <string name="morphe_proxy_auth_password_summary">Əsas proksi təsdiqlənməsi üçün parol</string>
+  <string name="morphe_proxy_allow_direct_fallback_title">Birbaşa ehtiyat keçidə icazə ver</string>
+  <string name="morphe_proxy_allow_direct_fallback_summary">Proksi sıradan çıxarsa, birbaşa qoşul</string>
   <!-- ad.hideFullscreenAdsPatch -->
   <string name="morphe_hide_fullscreen_ads_title">Tam ekran reklamlarını gizlət</string>
   <!-- 'Spoof video streams' should be the same translation used for 'morphe_spoof_video_streams_screen_title'. -->
@@ -120,4 +151,29 @@ Oynadıcı JavaScript hash-i köhnədirsə, oynatma uğursuz olacaq."</string>
   <string name="morphe_replace_music_with_youtube_summary">Paylaşılan linklərdə music.youtube.com- u youtube.com- a dəyişir</string>
   <string name="morphe_replace_links_with_shortener_title">Paylaşma keçidlərini youtu.be-yə dəyişdir</string>
   <string name="morphe_replace_links_with_shortener_summary">Videoları qısaldılan youtu.be URL formatın istifadə etməyə zorlayır</string>
+  <!-- misc.debugging.enableDebuggingPatch -->
+  <string name="morphe_debug_protobuffer_title">Bufer protokol sazlanma jurnalı</string>
+  <string name="morphe_debug_protobuffer_summary">Tətbiq elementlərin təyin etmək məqsədilə tərtibatçılar üçün əlavə giriş məlumatları əlavə edir</string>
+  <string name="morphe_debug_protobuffer_user_dialog_message">"Bu seçimi aktivləşdirmə bəzi UI quruluşları üçün ekran mətni də olmaqla əlavə tərtibat bazasını daxil edəcək.
+
+Bu, xüsusi filtrlər yaradarkən quruluşları müəyyən etməyə kömək edə bilər.
+
+Hər halda, bunu aktivləşdirmə IP ünvanınız kimi bəzi istifadəçi məlumatın da daxil edəcək."</string>
+  <!-- Custom filter -->
+  <string name="morphe_custom_filter_screen_title">Fərdi filtr</string>
+  <string name="morphe_custom_filter_screen_summary">Hər hansı elementi gizlətmək üçün fərdi filtrləri tənzimlə</string>
+  <string name="morphe_custom_filter_title">Fərdi filtri aktivləşdir</string>
+  <string name="morphe_custom_filter_strings_title">Fərdi filtr</string>
+  <!-- 'Component path builder strings' is the technical name for identifying the Litho UI layout items to hide. This is an advanced feature and most users will never use this. -->
+  <string name="morphe_custom_filter_strings_summary">Yeni cərgələrlə ayrılan, filtr üçün element yol qurucusu sətirlərinin siyahısı</string>
+  <string name="morphe_custom_filter_toast_invalid_syntax">Etibarsız fərdi filtr: %s</string>
+  <!-- misc.spoof.appversion.spoofAppVersionPatch -->
+  <string name="morphe_spoof_app_version_title">Tətbiq versiyasını saxtalaşdır</string>
+  <string name="morphe_spoof_app_version_summary">Köhnə UI xüsusiyyətlərini qaytarmaq üçün serveri daha köhnə tətbiq versiyasını istifadə etdiyinizi düşünməyə inandırır</string>
+  <string name="morphe_spoof_app_version_user_dialog_message">"Tətbiq versiyası köhnə versiyaya saxtalaşdırılacaq.
+
+Bu tətbiqin görünüşün və xüsusiyyətlərin dəyişdirəcək, lakin bilinməyən yan təsirlər ola bilər.
+
+Sonradan qapadılarsa, UI səhvlərin önləmək üçün tətbiq məlumatların silmək tövsiyə olunur."</string>
+  <string name="morphe_spoof_app_version_target_title">Saxta tətbiq versiyası hədəfi</string>
 </resources>

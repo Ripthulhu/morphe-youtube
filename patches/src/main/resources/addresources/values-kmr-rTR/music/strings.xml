@@ -21,16 +21,21 @@ Second \"item\" text"</string>
   <string name="morphe_header_logo_title">Logo-ya serê</string>
   <string name="morphe_header_logo_entry_1">Bixwe</string>
   <string name="morphe_header_logo_entry_3">Şêwazî</string>
+  <!-- interaction.downloads.downloadsPatch -->
+  <string name="morphe_external_downloader_screen_summary">Vîdyoyên muzîkê, podcast an stran bi sepanên dakêşkirina sêjiyê dakêşîne</string>
+  <!-- 'Download' should be translated using the same localized wording YouTube displays for the button. -->
+  <string name="morphe_external_downloader_action_button_title">Butona Dawnekarê Guherîn</string>
+  <string name="morphe_external_downloader_action_button_summary">Li şûna fonksiyona dawnekarê ya înşaî ya YouTube Music, dawnekarê we yê dildar bikar tîne</string>
+  <string name="morphe_external_downloader_flyout_menu_title">Menuya Dawnekarê Guherîn</string>
   <!-- misc.settings.settingsPatch -->
   <!-- In languages where "About" is ambiguous, translate this as "About Morphe" (i.e., About this app). -->
   <string name="morphe_settings_music_screen_0_about_title">Derbar</string>
   <string name="morphe_settings_music_screen_1_ads_title">Reklam</string>
   <string name="morphe_settings_music_screen_2_general_title">Sazî</string>
   <string name="morphe_settings_music_screen_3_player_title">Lîstikvan</string>
-  <string name="morphe_settings_music_screen_4_misc_title">Cûre</string>
-  <!-- ad.general.hideAdsPatch -->
+  <string name="morphe_settings_music_screen_6_misc_title">Mixc</string>
+  <!-- ad.hideAdsPatch -->
   <string name="morphe_music_hide_get_premium_label_title">\'Get Music Premium\' etîketê veşêre</string>
-  <!-- ad.video.hideVideoAdsPatch -->
   <string name="morphe_music_hide_video_ads_title">Reklamên wîdyoyê veşêre</string>
   <!-- interaction.crossfade.crossfadePatch -->
   <string name="morphe_music_crossfade_screen_title">Gerhezkirin</string>
@@ -97,13 +102,75 @@ Sehkirina crossfade bo temaşekirina vîdêoyek muzîkê dikare hinek vîdeo re�
 YouTube Music 8.x — crossfade tenê li 9.x û nûjenertirîn de dimeşe"</string>
   <string name="morphe_music_crossfade_about_credit_title">Kreya xwedî</string>
   <string name="morphe_music_crossfade_about_credit_summary">Taybeta crossfade ji aliyê VazerOG ve hatî çêkirin</string>
-  <!-- interaction.permanentrepeat.permanentRepeatPatch -->
-  <string name="morphe_music_play_permanent_repeat_title">Tekrar davim berdewam bike</string>
+  <!-- interaction.remember.repeatstate.rememberRepeatStatePatch-->
+  <string name="morphe_music_remember_repeat_state_title">Rewindê bikin, rewşa dublêkirinê</string>
+  <!-- interaction.remember.shufflestate.rememberShuffleStatePatch -->
+  <string name="morphe_music_remember_shuffle_state_title">Rewindê bikin, rewşa tevlihevkirinê</string>
+  <!-- interaction.dislikeredirection.disableDislikeRedirectionPatch -->
+  <string name="morphe_music_disable_dislike_redirection_title">Rihiya kirê destûrê da veguherandina hez kirinê</string>
+  <string name="morphe_music_disable_dislike_redirection_summary">Êdî dema butonê hez kirinê kişandinê, veguherandina stranê paşê nabe</string>
   <!-- layout.buttons.hideButtonsPatch -->
-  <string name="morphe_music_hide_cast_button_title">Keleka pêşandanê veşêre</string>
-  <string name="morphe_music_hide_history_button_title">Keleka dîrokê veşêre</string>
-  <string name="morphe_music_hide_notification_button_title">Keleka ragihandinê veşêre</string>
-  <string name="morphe_music_hide_search_button_title">Keleka lêgerînê veşêre</string>
+  <string name="morphe_music_hide_cast_button_title">Butona Şîrkirinê Veşêrin</string>
+  <string name="morphe_music_hide_history_button_title">Butona Dîrokê Veşêrin</string>
+  <string name="morphe_music_hide_notification_button_title">Butona Notîfîkirinê Veşêrin</string>
+  <string name="morphe_music_hide_search_button_title">Butona Lêkirinê Veşêrin</string>
+  <!-- layout.hide.general.hideMusicComponentsPatch -->
+  <string name="morphe_music_hide_lyrics_panel_category_title">Panela lîrîkê</string>
+  <string name="morphe_music_hide_lyrics_share_button_title">Butona Parvekirin veşêrin</string>
+  <string name="morphe_music_hide_lyrics_translate_button_title">Butona Tercîhê veşêrin</string>
+  <!-- layout.hide.actionbuttons.hideActionButtonsPatch -->
+  <string name="morphe_music_action_buttons_screen_title">Butonên Çalakiyê</string>
+  <string name="morphe_music_action_buttons_screen_summary">Hilbijêrin ku kîjan butonên çalakiyê li bin playerê xuya bibin</string>
+  <string name="morphe_music_hide_action_bar_title">Çekûlbarê bigihîne</string>
+  <string name="morphe_music_hide_like_dislike_button_title">Butona Hezdikirin û Nefesgirtinê veşêrin</string>
+  <string name="morphe_music_hide_comments_button_title">Butona Şîroveyan veşêrin</string>
+  <!-- 'Lyrics' should be translated using the same localized wording YouTube Music displays for the button. -->
+  <string name="morphe_music_hide_lyrics_button_title">Butona Sözan veşêrin</string>
+  <!-- 'Share' should be translated using the same localized wording YouTube Music displays for the button. -->
+  <string name="morphe_music_hide_share_button_title">Dîmena Butona Parvekirinê</string>
+  <!-- 'Save' should be translated using the same localized wording YouTube Music displays for the button. -->
+  <string name="morphe_music_hide_save_button_title">Dîmena Butona Xazkirinê</string>
+  <!-- 'Download' should be translated using the same localized wording YouTube Music displays for the button. -->
+  <string name="morphe_music_hide_download_button_title">Dîmena Butona Dakêşkirinê</string>
+  <!-- 'Start radio' should be translated using the same localized wording YouTube Music displays for the button. -->
+  <string name="morphe_music_hide_radio_button_title">Dîmena Butona Destpêkirina Radyoyê</string>
+  <!-- flyoutmenu.components.hideFlyoutMenuComponentsPatch -->
+  <string name="morphe_music_hide_flyout_menu_components_screen_title">Menûya pêşbaz</string>
+  <string name="morphe_music_hide_flyout_menu_components_screen_summary">Hilbijêre ku kîjan pêkhatî di menuya lîstikvan de xuya bibin</string>
+  <string name="morphe_music_hide_flyout_menu_3_column_component_title">Pêvekirina beşa 3 kolonî veşêre</string>
+  <string name="morphe_music_hide_flyout_menu_like_dislike_title">Butonên Hezkirin û Nefretkirin veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_taste_match_title">Menuya \'Hevheviya tam\' veşêre</string>
+  <string name="morphe_music_hide_flyout_menu_add_to_listen_later_title">Veşêre \'Zêde bike playlista \'Paşê guhdar bike\' menu</string>
+  <string name="morphe_music_hide_flyout_menu_add_to_queue_title">Veşêre menuya \'Zêde bike qûlîşe\'</string>
+  <string name="morphe_music_hide_flyout_menu_captions_title">Menûya Serîpeşniyan veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_delete_playlist_title">\'Playlista sil\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_dismiss_queue_title">\'Siruştana qutîyê\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_dont_recommend_artist_title">\'Ji vê hunermendî hez nakim\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_download_title">Menûya Dakêşkirinê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_edit_playlist_title">\'Playlista edît kirin\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_go_to_album_title">\'Çinê albûmê\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_go_to_artist_title">\'Çinê hunermendî\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_go_to_episode_title">\'Çinê beşê\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_go_to_podcast_title">\'Çinê podcastê\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_help_title">Menûya Alîkariyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_mark_episode_as_played_title">\'Beşê wekî ku hatî guhdar kirin nîşan de\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_not_interested_title">\'Ez eleqedarî ji vê naxwazim\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_pin_to_speed_dial_title">\'Bêje hêsanî yê lezê\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_play_next_title">\'Pişka din\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_quality_title">Menûya Kalîteyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_remove_from_library_title">\'Ji nivîskxaneyê derxîne\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_remove_from_playlist_title">\'Ji playistayê derxîne\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_report_title">Menûya Raporkirinê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_save_episode_for_later_save_to_library_title">\'Parve bike\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_save_to_playlist_title">\'Parve kirin bo paşê\' / \'Parve kirin nivîskxaneyê\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_share_title">Menûya Parvekirinê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_shuffle_play_title">\'Lîstika tevgerî\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_sleep_timer_title">\'Demjimêrê xewê\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_start_radio_title">\'Destpêka radyoyê\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_stats_for_nerds_title">\'Statîstîk bo kesên zanistvan\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_subscribe_title">Menûya Şêwirinê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_unpin_from_speed_dial_title">\'Ji hêsanî bêje derxîne\' menûyê veşêrin</string>
+  <string name="morphe_music_hide_flyout_menu_view_song_credit_title">\'Nîşana krediya stranê dîtin\' menûyê veşêrin</string>
   <!-- layout.startpage.changeStartPagePatch -->
   <string name="morphe_change_start_page_title">Rûpêka serê</string>
   <string name="morphe_change_start_page_entry_default">Bixwe</string>
@@ -116,11 +183,13 @@ YouTube Music 8.x — crossfade tenê li 9.x û nûjenertirîn de dimeşe"</stri
   <string name="morphe_change_start_page_entry_playlists">Lîste-yên weşangez</string>
   <string name="morphe_change_start_page_entry_search">Bigere</string>
   <string name="morphe_change_start_page_entry_subscriptions">Refqandin</string>
-  <!-- layout.compactheader.hideCategoryBarPatch -->
-  <string name="morphe_music_hide_category_bar_title">Keleka kategoriya veşêre</string>
+  <!-- layout.compactheader.hideFilterBarPatch -->
+  <string name="morphe_music_hide_filter_bar_title">Pêvekirina bara fîltreyê veke</string>
   <!-- layout.miniplayer.changeMiniplayerColorPatch -->
   <string name="morphe_music_change_miniplayer_color_title">Rengê miniplayer-a biguhezîne</string>
   <string name="morphe_music_change_miniplayer_color_summary">Rengê lîstikvanê biçîk bi rengê lîstikvanê bi tevahî yê veguherîne</string>
+  <string name="morphe_music_change_navigation_bar_color_title">Rengê bara pêvajoyê biguherîne</string>
+  <string name="morphe_music_change_navigation_bar_color_summary">Rengê bara pêvajoyê bi lîstikvanê tîkê têkildar dike</string>
   <!-- layout.miniplayer.miniplayerNextPreviousButtonsPatch -->
   <string name="morphe_music_miniplayer_next_button_title">ин cейизиб губи миниплейаибда</string>
   <string name="morphe_music_miniplayer_previous_button_title">Seroka butona li miniplayerê de</string>
@@ -145,6 +214,72 @@ YouTube Music 8.x — crossfade tenê li 9.x û nûjenertirîn de dimeşe"</stri
   <string name="morphe_music_hide_navigation_bar_upgrade_button_title">Butona Nûvekirinê veşêrin</string>
   <string name="morphe_music_hide_navigation_bar_title">Barê navigasyonê veşêre</string>
   <string name="morphe_music_hide_navigation_bar_labels_title">Etîketên barê navigasyonê veşêre</string>
-  <!-- layout.upgradebutton.hideUpgradeButtonPatch -->
-  <string name="morphe_music_hide_upgrade_button_title">Bişevêna barê veşêre</string>
+  <!-- interaction.scrobbling.scrobblingPatch -->
+  <string name="morphe_music_scrobbling_summary">Konfîgkirina entegrasyona Last.fm û ListenBrainz</string>
+  <string name="morphe_music_scrobbling_summary_logged_out">Ne têkeve. Têke da ku konfîg bike</string>
+  <string name="morphe_music_scrobbling_log_out">Derkeve</string>
+  <string name="morphe_music_scrobbling_logged_out_toast">Derketin</string>
+  <!-- 'scrobbling' must be kept untranslated -->
+  <string name="morphe_music_scrobbling_enabled_title">Scrobbling etkin bike</string>
+  <string name="morphe_music_scrobbling_now_playing_title">Statûya \'Niha Dihêje\' şandin</string>
+  <string name="morphe_music_scrobbling_min_song_duration_title">Dirêjiya herî kêm a stranê</string>
+  <!-- 'scrobbled' must be kept untranslated -->
+  <string name="morphe_music_scrobbling_min_song_duration_summary">Stranên ji vê kurtir nayên scrobble kirin</string>
+  <!-- 'scrobble' must be kept untranslated -->
+  <string name="morphe_music_scrobbling_delay_percent_title">دراستانيا scrobble ya ji rêsî%</string>
+  <!-- 'scrobble' must be kept untranslated -->
+  <string name="morphe_music_scrobbling_delay_percent_summary">Piştî guhdarîya vê rêjeya stranê scrobble bide</string>
+  <!-- 'scrobble' must be kept untranslated -->
+  <string name="morphe_music_scrobbling_delay_seconds_title">Saniyeyên scrobble ya ji rêsî</string>
+  <!-- 'scrobble' must be kept untranslated -->
+  <string name="morphe_music_scrobbling_delay_seconds_summary">Piştî guhdarîya vê qas saniyan scrobble bide</string>
+  <string name="morphe_music_listenbrainz_token_title">Hesaba ListenBrainz</string>
+  <string name="morphe_music_listenbrainz_token_summary_logged_in">Têkeve. Têke da ku hesabê birêve bike</string>
+  <!-- 'scrobbling' must be kept untranslated -->
+  <string name="morphe_music_listenbrainz_token_dialog_instruction">Tokena bikarînerê ListenBrainz-ê têkevin da ku lêkirinê çalak bike</string>
+  <string name="morphe_music_listenbrainz_token_dialog_hint">Token</string>
+  <string name="morphe_music_listenbrainz_token_dialog_get_token">Token bistîne</string>
+  <string name="morphe_music_listenbrainz_token_dialog_verify">Verastkirin</string>
+  <string name="morphe_music_listenbrainz_token_status_empty">Ji kerem tokenê têkevin</string>
+  <string name="morphe_music_listenbrainz_token_status_validating">Verastkirin...</string>
+  <string name="morphe_music_listenbrainz_token_status_valid">Token valide! Bikarîner: %s</string>
+  <string name="morphe_music_listenbrainz_token_status_invalid">Token ne valide: %s</string>
+  <string name="morphe_music_listenbrainz_token_status_invalid_unknown">Nezanîn</string>
+  <string name="morphe_music_listenbrainz_token_status_failed">Verastkirin têk çû: %s</string>
+  <string name="morphe_music_listenbrainz_token_toast_cleared">Token paqij kirin</string>
+  <string name="morphe_music_listenbrainz_token_toast_saved">Token ji nû ve hat tomarkirin</string>
+  <string name="morphe_music_listenbrainz_token_toast_invalid_warning">Hişyarî: Tokena hat tomarkirin ne valide ye!</string>
+  <string name="morphe_music_lastfm_love_on_like_title">Stranên hezkirî hez bike</string>
+  <string name="morphe_music_lastfm_love_on_like_summary">Bi otomatîkî stranên Last.fm de hez kirin dema ku hûn wan li YouTube Music de hez dikin (û hezkirina we winda bikin dema ku ne hezkirî an na hes xwe li wan dikin)</string>
+  <string name="morphe_music_lastfm_token_title">Hesaba Last.fm</string>
+  <string name="morphe_music_lastfm_token_summary_logged_in">Têkeve wek %s. Têke da ku hesabê birêve bike</string>
+  <string name="morphe_music_lastfm_token_dialog_instruction">Navê bikarînerê Last.fm-ê têkevin da ku têkevin</string>
+  <string name="morphe_music_lastfm_token_dialog_username_hint">Navê bikarînerê</string>
+  <string name="morphe_music_lastfm_token_dialog_password_hint">Şîfre</string>
+  <string name="morphe_music_lastfm_token_dialog_login">Têkeve</string>
+  <string name="morphe_music_lastfm_token_status_empty">Ji kerem navê bikarînerê û şîfre têkevin</string>
+  <string name="morphe_music_lastfm_token_status_logging_in">Têkevin...</string>
+  <string name="morphe_music_lastfm_token_status_success">Serkeftî têkeve!</string>
+  <string name="morphe_music_lastfm_token_status_no_session">Ji Last.fm-ê sesyonê girtin pêk nehat</string>
+  <string name="morphe_music_lastfm_token_status_failed">Têkevin pêk nehat: %s</string>
+  <string name="morphe_music_lastfm_token_toast_saved">Agahiyên Last.fm hatin tomarkirin!</string>
+  <string name="morphe_settings_music_scrobbling_metadata_title">Paqijkirina metadata</string>
+  <string name="morphe_music_scrobbling_metadata_cleanup_title">Metadata paqij bike</string>
+  <string name="morphe_music_scrobbling_metadata_cleanup_summary">Bi otomatîkî metadata-ya hevpar (wek \"Vîdeoya fermî\", \"Remaster\", \"Zindî\") ji sernavan, hunerîstan, û albuman paqij bike berî lêkirinê</string>
+  <string name="morphe_music_scrobbling_custom_regex_title">Paqijkirina regex-a xwerû</string>
+  <string name="morphe_music_scrobbling_custom_regex_summary">Bi rêzekê ya pêşniyazkirî bikar bîne da ku nivîsa zêde ji sernavên stran, hunermend an albûman were hildan. Mînak: (?i)\\s*\\((clean|explicit)\\)</string>
+  <string name="morphe_music_scrobbling_parse_title_title">Hûnerê ji sernavê de dîtin û şîrovekirin</string>
+  <string name="morphe_music_scrobbling_parse_title_summary">Navê hunerê û şîrovekirinê ji sernavê vîdyoyê bi rêya vê neşê \" - \" derxin. Ji bo naverokên ku hatine barkirin lênêrîn, navê kanalê dikare wek hunerê were bikaranîn.</string>
+  <!-- 'scrobbling' must be kept untranslated -->
+  <string name="morphe_music_scrobbling_about_title">Derbarê lêkirinê</string>
+  <!-- 'scrobbling' must be kept untranslated -->
+  <string name="morphe_music_scrobbling_about_summary">"Scrobbling bi xwezayî karanîna YouTube Music ya we bi profîla we ya Last.fm an ListenBrainz re hevdeng dike.
+
+Ji bo ku bêyî astengiyê scrobbling li ser lîstikên paşnavê were hevdengkirin, pê ewle bibin ku karanîna pîlê ya YouTube Music wek \"Nerêkûkirî\" hatî destnîşankirin."</string>
+  <!-- misc.spoof.appversion.spoofAppVersionPatch -->
+  <string name="morphe_music_spoof_app_version_target_entry_6_35_52">6.35.52 - Pêla panelê ya kevnar vegerîne</string>
+  <string name="morphe_music_spoof_app_version_target_entry_6_42_55">6.42.55 - Lîrîkên demî qedexe bike</string>
+  <string name="morphe_music_spoof_app_version_target_entry_7_12_52">7.12.52 - Lîrîkên dînamîkî yên kevnar vegerîne</string>
+  <string name="morphe_music_spoof_app_version_target_entry_7_16_53">7.16.53 - Barra çalakiyê ya kevnar vegerîne</string>
+  <string name="morphe_music_spoof_app_version_target_entry_7_17_52">7.17.52 - Beşa şîrovanan di xwarê de xuya nabe</string>
 </resources>

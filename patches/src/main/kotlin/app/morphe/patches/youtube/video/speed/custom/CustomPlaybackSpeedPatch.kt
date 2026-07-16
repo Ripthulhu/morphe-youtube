@@ -5,7 +5,7 @@
  * Original hard forked code:
  * https://github.com/ReVanced/revanced-patches/commit/724e6d61b2ecd868c1a9a37d465a688e83a74799
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to Morphe contributions.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to Morphe contributions.
  */
 
 package app.morphe.patches.youtube.video.speed.custom
@@ -21,18 +21,18 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableField
 import app.morphe.patcher.util.proxy.mutableTypes.MutableField.Companion.toMutable
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.Companion.toMutable
 import app.morphe.patches.all.misc.resources.resourceMappingPatch
+import app.morphe.patches.shared.misc.litho.filter.addLithoFilter
 import app.morphe.patches.shared.misc.settings.preference.InputType
 import app.morphe.patches.shared.misc.settings.preference.SwitchPreference
 import app.morphe.patches.shared.misc.settings.preference.TextPreference
 import app.morphe.patches.youtube.misc.extension.sharedExtensionPatch
-import app.morphe.patches.youtube.misc.litho.filter.addLithoFilter
 import app.morphe.patches.youtube.misc.litho.filter.lithoFilterPatch
 import app.morphe.patches.youtube.misc.playservice.is_20_34_or_greater
 import app.morphe.patches.youtube.misc.playservice.is_21_02_or_greater
 import app.morphe.patches.youtube.misc.playservice.is_21_12_or_greater
 import app.morphe.patches.youtube.misc.playservice.versionCheckPatch
-import app.morphe.patches.youtube.misc.recyclerviewtree.hook.addRecyclerViewTreeHook
-import app.morphe.patches.youtube.misc.recyclerviewtree.hook.recyclerViewTreeHookPatch
+import app.morphe.patches.youtube.misc.recyclerviewtree.addRecyclerViewTreeHook
+import app.morphe.patches.youtube.misc.recyclerviewtree.recyclerViewTreeHookPatch
 import app.morphe.patches.youtube.misc.settings.settingsPatch
 import app.morphe.patches.youtube.shared.PlaybackSpeedOnItemClickParentFingerprint
 import app.morphe.patches.youtube.video.speed.settingsMenuVideoSpeedGroup
@@ -136,23 +136,25 @@ internal val customPlaybackSpeedPatch = bytecodePatch(
         // Add a static INSTANCE field to the class.
         // This is later used to call "showOldPlaybackSpeedMenu" on the instance.
 
+        val initializePlaybackSpeedType = InitializePlaybackSpeedValuesFingerprint.originalClassDef.type
         val instanceField = ImmutableField(
-            GetOldPlaybackSpeedsFingerprint.originalClassDef.type,
+            initializePlaybackSpeedType,
             "INSTANCE",
-            GetOldPlaybackSpeedsFingerprint.originalClassDef.type,
+            initializePlaybackSpeedType,
             AccessFlags.PUBLIC.value or AccessFlags.STATIC.value,
             null,
             null,
             null,
         ).toMutable()
 
-        GetOldPlaybackSpeedsFingerprint.classDef.staticFields.add(instanceField)
-        // Set the INSTANCE field to the instance of the class.
-        // In order to prevent a conflict with another patch, add the instruction at index 1.
-        GetOldPlaybackSpeedsFingerprint.method.addInstruction(
-            1,
-            "sput-object p0, $instanceField"
-        )
+        InitializePlaybackSpeedValuesFingerprint.let {
+            it.classDef.staticFields.add(instanceField)
+            // Set the INSTANCE field to the instance of the class.
+            it.method.addInstruction(
+                0,
+                "sput-object p0, $instanceField"
+            )
+        }
 
         // Get the "showOldPlaybackSpeedMenu" method.
         // This is later called on the field INSTANCE.
@@ -310,8 +312,6 @@ internal val customPlaybackSpeedPatch = bytecodePatch(
         // region Custom tap and hold 2x speed.
 
         TapAndHoldSpeedFingerprint.let {
-            // clearMatch() is used because it can be the same method as [tapAndHoldHapticsFingerprint].
-            it.clearMatch()
             it.method.apply {
                 val speedIndex = it.instructionMatches.last().index
                 val speedRegister =

@@ -5,7 +5,7 @@
  * Original hard forked code:
  * https://github.com/ReVanced/revanced-patches/commit/724e6d61b2ecd868c1a9a37d465a688e83a74799
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to Morphe contributions.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to Morphe contributions.
  */
 
 package app.morphe.extension.youtube.patches.components;
@@ -23,10 +23,15 @@ import androidx.annotation.NonNull;
 import java.util.List;
 
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.shared.patches.components.BufferAsciiStrings;
+import app.morphe.extension.shared.patches.components.ByteArrayFilterGroup;
+import app.morphe.extension.shared.patches.components.ByteArrayFilterGroupList;
+import app.morphe.extension.shared.patches.components.ContextInterface;
+import app.morphe.extension.shared.patches.components.Filter;
+import app.morphe.extension.shared.patches.components.StringFilterGroup;
 import app.morphe.extension.youtube.innertube.NextResponseOuterClass.NewElement;
-import app.morphe.extension.youtube.patches.components.LithoFilterPatch.BufferAsciiStrings;
+import app.morphe.extension.youtube.patches.VersionCheckPatch;
 import app.morphe.extension.youtube.settings.Settings;
-import app.morphe.extension.youtube.shared.ConversionContext.ContextInterface;
 import app.morphe.extension.youtube.shared.PlayerType;
 
 @SuppressWarnings("unused")
@@ -40,24 +45,20 @@ public class CommentsFilter extends Filter {
     private static final List<String> commentsCarouselFilterStrings = getFilterStrings(Settings.HIDE_COMMENTS_CAROUSEL_FILTER_STRINGS);
 
     private final StringFilterGroup comments;
+    private final StringFilterGroup commentComposerButtons;
+    private final ByteArrayFilterGroupList commentComposerButtonsGroupList = new ByteArrayFilterGroupList();
+    private final StringFilterGroup commentsFilterBar;
     private final StringFilterGroup emojiAndTimestampButtons;
     private final StringFilterGroup previewCommentDotsSelector;
-    
     public CommentsFilter() {
-        var chatSummary = new StringFilterGroup(
-                Settings.HIDE_COMMENTS_AI_CHAT_SUMMARY,
-                "live_chat_summary_banner.e"
-        );
-
         var channelGuidelines = new StringFilterGroup(
                 Settings.HIDE_COMMENTS_CHANNEL_GUIDELINES,
                 "channel_guidelines_entry_banner"
         );
 
-        var commentsByMembers = new StringFilterGroup(
-                Settings.HIDE_COMMENTS_BY_MEMBERS_HEADER,
-                "sponsorships_comments_header.e",
-                "sponsorships_comments_footer.e"
+        var chatSummary = new StringFilterGroup(
+                Settings.HIDE_COMMENTS_AI_CHAT_SUMMARY,
+                "live_chat_summary_banner.e"
         );
 
         comments = new StringFilterGroup(
@@ -66,9 +67,32 @@ public class CommentsFilter extends Filter {
                 "_comments"
         );
 
-        var communityGuidelines = new StringFilterGroup(
-                Settings.HIDE_COMMENTS_COMMUNITY_GUIDELINES,
-                "community_guidelines"
+        var commentsByMembers = new StringFilterGroup(
+                Settings.HIDE_COMMENTS_BY_MEMBERS_HEADER,
+                "sponsorships_comments_header.e",
+                "sponsorships_comments_footer.e"
+        );
+
+        commentComposerButtons = new StringFilterGroup(
+                null,
+                "|ContainerType|ContainerType|ContainerType|ContainerType|",
+                "composer_main_action_button.e"
+        );
+
+        commentComposerButtonsGroupList.addAll(
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_COMMENTS_CREATE_A_SHORT_BUTTON,
+                        "composer_short_creation_button.e"
+                ),
+                new ByteArrayFilterGroup(
+                        Settings.HIDE_COMMENTS_THANKS_BUTTON,
+                        "super_thanks_button.e"
+                )
+        );
+
+        commentsFilterBar = new StringFilterGroup(
+                Settings.HIDE_FILTER_BAR_IN_COMMENTS,
+                CHIP_BAR_PATH_PREFIX
         );
 
         var commentsPrompts = new StringFilterGroup(
@@ -78,7 +102,12 @@ public class CommentsFilter extends Filter {
                 "timed_comments_end.e"
         );
 
-        var createAShort = new StringFilterGroup(
+        var communityGuidelines = new StringFilterGroup(
+                Settings.HIDE_COMMENTS_COMMUNITY_GUIDELINES,
+                "community_guidelines"
+        );
+
+        var createAShortButton = new StringFilterGroup(
                 Settings.HIDE_COMMENTS_CREATE_A_SHORT_BUTTON,
                 "composer_short_creation_button.e"
         );
@@ -86,6 +115,12 @@ public class CommentsFilter extends Filter {
         emojiAndTimestampButtons = new StringFilterGroup(
                 Settings.HIDE_COMMENTS_EMOJI_AND_TIMESTAMP_BUTTONS,
                 "|CellType|ContainerType|ContainerType|ContainerType|ContainerType|ContainerType|"
+        );
+
+        var giftAnimationAndCards = new StringFilterGroup(
+                Settings.HIDE_COMMENTS_GIFT_ANIMATION_AND_CARDS,
+                "gift_overlay.e",
+                "gift_attribution_card_classic_live.e"
         );
 
         var previewComment = new StringFilterGroup(
@@ -110,43 +145,74 @@ public class CommentsFilter extends Filter {
                 chatSummary,
                 comments,
                 commentsByMembers,
+                commentComposerButtons,
+                commentsFilterBar,
                 commentsPrompts,
                 communityGuidelines,
-                createAShort,
+                createAShortButton,
                 emojiAndTimestampButtons,
+                giftAnimationAndCards,
                 previewComment,
                 previewCommentDotsSelector,
                 thanksButton
-
         );
     }
 
     @Override
-    boolean isFiltered(ContextInterface contextInterface,
-                       String identifier,
-                       String accessibility,
-                       String path,
-                       byte[] buffer,
-                       BufferAsciiStrings asciiStrings,
-                       StringFilterGroup matchedGroup,
-                       FilterContentType contentType,
-                       int contentIndex) {
-        if (matchedGroup == previewCommentDotsSelector) {
-            return path.contains("carousel_header")
-                        &&
-                    path.endsWith("|ContainerType|ContainerType|ContainerType|");
-        }
-
+    public boolean isFiltered(ContextInterface contextInterface,
+                              String identifier,
+                              String accessibility,
+                              String path,
+                              byte[] buffer,
+                              BufferAsciiStrings asciiStrings,
+                              StringFilterGroup matchedGroup,
+                              FilterContentType contentType,
+                              int contentIndex) {
         if (matchedGroup == comments) {
             if (path.startsWith(VIDEO_LOCKUP_WITH_ATTACHMENT_PATH)) {
                 return Settings.HIDE_COMMENTS_SECTION_IN_HOME_FEED.get();
             }
             return Settings.HIDE_COMMENTS_SECTION.get();
-        } else if (matchedGroup == emojiAndTimestampButtons) {
+        }
+
+        if (matchedGroup == commentComposerButtons) {
+            if (!VersionCheckPatch.IS_20_31_OR_GREATER) {
+                return false;
+            }
+            return commentComposerButtonsGroupList.check(buffer).isFiltered();
+        }
+
+        if (matchedGroup == commentsFilterBar) {
+            return Settings.HIDE_FILTER_BAR_IN_COMMENTS.get() && PlayerType.getCurrent().isMaximizedOrFullscreen();
+        }
+
+        if (matchedGroup == emojiAndTimestampButtons) {
             return path.startsWith(COMMENT_COMPOSER_PATH);
         }
 
+        if (matchedGroup == previewCommentDotsSelector) {
+            return path.contains("carousel_header") && path.endsWith("|ContainerType|ContainerType|ContainerType|");
+        }
+
         return true;
+    }
+
+    /**
+     * Injection point.
+     */
+    public static void hideInComments(View view) {
+        if (view == null || !Settings.HIDE_FILTER_BAR_IN_COMMENTS.get()) {
+            return;
+        }
+
+        if (PlayerType.getCurrent().isMaximizedOrFullscreen()) {
+            ViewGroup.LayoutParams lp = view.getLayoutParams();
+            if (lp != null) {
+                lp.height = 0;
+                view.setLayoutParams(lp);
+            }
+            view.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -230,10 +296,10 @@ public class CommentsFilter extends Filter {
     /**
      * Injection point.
      */
-    public static void sanitizeCommentsCategoryBar(@NonNull String identifier,
+    public static void hideCommentsFilterBarOptions(@NonNull String identifier,
                                                    @NonNull List<Object> treeNodeResultList) {
         try {
-            if (Settings.SANITIZE_COMMENTS_CATEGORY_BAR.get()
+            if (Settings.HIDE_COMMENTS_FILTER_BAR_OPTIONS.get()
                     && identifier.startsWith(CHIP_BAR_PATH_PREFIX)
                     // Playlist sort button uses same components and must only filter if the player is opened.
                     && PlayerType.getCurrent().isMaximizedOrFullscreen()
@@ -244,7 +310,7 @@ public class CommentsFilter extends Filter {
                 }
             }
         } catch (Exception ex) {
-            Logger.printException(() -> "Failed to sanitize comment category bar", ex);
+            Logger.printException(() -> "Failed to hide comment filter bar options", ex);
         }
     }
 
@@ -294,6 +360,31 @@ public class CommentsFilter extends Filter {
                 lp.height = 0;
                 view.setLayoutParams(lp);
             }
+
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Injection point.
+     */
+    public static void hideLiveChatGiftButton(View view) {
+        if (Settings.HIDE_COMMENTS_GIFT_BUTTON.get() && view != null) {
+            ViewGroup.LayoutParams lp = view.getLayoutParams();
+            if (lp != null) {
+                lp.width = 0;
+                lp.height = 0;
+
+                if (lp instanceof ViewGroup.MarginLayoutParams marginLp) {
+                    marginLp.setMargins(0, 0, 0, 0);
+                    marginLp.setMarginStart(0);
+                    marginLp.setMarginEnd(0);
+                }
+
+                view.setLayoutParams(lp);
+            }
+
+            view.setPadding(0, 0, 0, 0);
             view.setVisibility(View.GONE);
         }
     }

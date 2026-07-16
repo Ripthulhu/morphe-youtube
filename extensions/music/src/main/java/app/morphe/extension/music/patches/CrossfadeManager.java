@@ -1,8 +1,8 @@
 /*
  * Copyright 2026 Morphe.
- * https://github.com/MorpheApp/morphe-patches
+ * https://github.com/MorpheApp/morphe-patches/pull/1065
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to this code.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to this code.
  */
 package app.morphe.extension.music.patches;
 
@@ -2768,7 +2768,7 @@ public class CrossfadeManager {
      * on every crossfade-engagement hook fire (manual skip, auto-advance,
      * monitor tick).
      */
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "RedundantSuppression"})
     private static boolean isAudioRoutedToCast() {
         if (Build.VERSION.SDK_INT < 28) return false;
 
@@ -2879,7 +2879,7 @@ public class CrossfadeManager {
         return casting;
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "RedundantSuppression"})
     @SuppressLint("MissingPermission")
     private static synchronized void toggleSessionPause() {
         isCrossfadePaused = !isCrossfadePaused;

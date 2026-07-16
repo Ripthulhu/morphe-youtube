@@ -5,7 +5,7 @@
  * Original hard forked code:
  * https://github.com/ReVanced/revanced-patches/commit/724e6d61b2ecd868c1a9a37d465a688e83a74799
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to Morphe contributions.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to Morphe contributions.
  */
 
 package app.morphe.patches.youtube.layout.hide.general
@@ -373,12 +373,40 @@ internal object ContextualMenuItemBuilderFingerprint : Fingerprint(
     returnType = "V",
     parameters = listOf("L", "L"),
     filters = listOf(
-        checkCast("Landroid/widget/TextView;"),
+        methodCall(
+            opcode = Opcode.INVOKE_STATIC,
+            returnType = "Ljava/lang/CharSequence;",
+        ),
+        checkCast(
+            type = "Landroid/widget/TextView;",
+            location = MatchAfterWithin(3),
+        ),
         methodCall(
             smali = "Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V",
-            location = MatchAfterWithin(5)
+            location = MatchAfterWithin(5),
+        ),
+        methodCall(
+            opcode = Opcode.INVOKE_STATIC,
+            returnType = "I",
+            location = MatchAfterWithin(7),
         ),
         resourceLiteral(ResourceType.DIMEN, "poster_art_width_default"),
+    )
+)
+
+internal object ContextualMenuItemBuilderOnClickFingerprint : Fingerprint(
+    classFingerprint = ContextualMenuItemBuilderFingerprint,
+    name = "onClick",
+    parameters = listOf("Landroid/view/View;"),
+    filters = listOf(
+        fieldAccess(
+            opcode = Opcode.IGET_OBJECT,
+            definingClass = "this",
+            type = "Ljava/lang/Object;"
+        ),
+        opcode(Opcode.CHECK_CAST, location = MatchAfterImmediately()),
+        opcode(Opcode.INVOKE_STATIC, location = MatchAfterImmediately()),
+        opcode(Opcode.MOVE_RESULT_OBJECT, location = MatchAfterImmediately())
     )
 )
 
@@ -669,6 +697,33 @@ internal object SyncButtonFingerprint : Fingerprint(
             opcode = Opcode.INVOKE_VIRTUAL,
             name = "inflate",
             returnType = "Landroid/view/View;",
+        ),
+        opcode(Opcode.MOVE_RESULT_OBJECT, location = MatchAfterImmediately())
+    )
+)
+
+internal object PanelSubheaderFingerprint : Fingerprint(
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    returnType = "V",
+    filters = listOf(
+        resourceLiteral(ResourceType.ID, "panel_header"),
+        resourceLiteral(ResourceType.ID, "close_button"),
+        resourceLiteral(ResourceType.ID, "panel_subheader"),
+        methodCall(
+            opcode = Opcode.INVOKE_VIRTUAL,
+            name = "removeAllViews"
+        )
+    )
+)
+
+internal object JewelsButtonContainerFingerprint : Fingerprint(
+    returnType = "Landroid/view/ViewGroup;",
+    parameters = listOf(),
+    filters = listOf(
+        resourceLiteral(ResourceType.ID, "jewels_button_container"),
+        methodCall(
+            opcode = Opcode.INVOKE_VIRTUAL,
+            name = "findViewById"
         ),
         opcode(Opcode.MOVE_RESULT_OBJECT, location = MatchAfterImmediately())
     )

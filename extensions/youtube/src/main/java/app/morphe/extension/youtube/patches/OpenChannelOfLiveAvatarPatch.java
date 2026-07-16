@@ -2,7 +2,7 @@
  * Copyright 2026 Morphe.
  * https://github.com/MorpheApp/morphe-patches
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to this code.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to this code.
  */
 
 package app.morphe.extension.youtube.patches;
@@ -48,8 +48,7 @@ public final class OpenChannelOfLiveAvatarPatch {
                 return false;
             }
             // Prevent a new request until the previous (if exists) is not done.
-            StreamOrDetailsDataRequest request = liveAvatarChannelRequest;
-            if (request != null && !request.fetchIsDone()) {
+            if (liveAvatarChannelRequest != null && !liveAvatarChannelRequest.fetchIsDone()) {
                 return false;
             }
             // Video was opened by clicking a playlist thumbnail.

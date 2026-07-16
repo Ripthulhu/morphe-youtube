@@ -20,6 +20,7 @@ Second \"item\" text"</string>
   <string name="morphe_restart_first_run">Рестартирај за да завршиш со поставување</string>
   <!-- layout.branding.baseCustomBrandingPatch -->
   <string name="morphe_custom_branding_name_title">Име на апликацијата</string>
+  <!-- interaction.downloads.downloadsPatch -->
   <!-- Translations of this should be identical to morphe_custom_branding_icon_entry_7 -->
   <string name="morphe_custom_branding_name_entry_5">Прилагодено</string>
   <string name="morphe_custom_branding_icon_title">Икона на апликацијата</string>
@@ -40,7 +41,7 @@ Second \"item\" text"</string>
   <string name="morphe_check_watch_history_domain_name_dialog_title">Известување на Morphe</string>
   <string name="morphe_check_watch_history_domain_name_dialog_message">Вашата историја на гледање не се зачувува.&lt;br&gt;&lt;br&gt;Ова најверојатно е предизвикано од DNS блокирање на реклами или прокси мрежа.&lt;br&gt;&lt;br&gt;За да го решите ова, додајте &lt;b&gt;s.youtube.com&lt;/b&gt; на белата листа или исклучете ги сите DNS блокирања и прокси-а.</string>
   <string name="morphe_check_watch_history_domain_name_dialog_ignore">Не покажувај повторно</string>
-  <!-- misc.fix.playback.spoofVideoStreamsPatch -->
+  <!-- misc.spoof.spoofVideoStreamsPatch -->
   <string name="morphe_spoof_video_streams_screen_title">Лажирај видео стримови</string>
   <string name="morphe_spoof_video_streams_screen_summary">Конфигурирај лажирање на клиенти за да спречиш проблеми со репродукцијата</string>
   <string name="morphe_spoof_video_streams_title">Лажирај видео стримови</string>
@@ -101,6 +102,7 @@ Second \"item\" text"</string>
   <!-- misc.audio.tracks.forceOriginalAudioPatch -->
   <string name="morphe_force_original_audio_title">Принудно оригинално аудио</string>
   <string name="morphe_force_original_audio_summary">Секогаш пуштај оригинален аудио трак за видео наместо добликан верзија</string>
+  <!-- misc.proxy.networkProxyPatch -->
   <!-- ad.hideFullscreenAdsPatch -->
   <string name="morphe_hide_fullscreen_ads_title">Скриј реклами со целоцен екран</string>
   <!-- 'Spoof video streams' should be the same translation used for 'morphe_spoof_video_streams_screen_title'. -->
@@ -112,4 +114,9 @@ Second \"item\" text"</string>
   <string name="morphe_replace_music_with_youtube_summary">Ја заменува music.youtube.com со youtube.com во споделуваните линкови.</string>
   <string name="morphe_replace_links_with_shortener_title">Промени линковите за споделување на youtu.be</string>
   <string name="morphe_replace_links_with_shortener_summary">Принудува видеата да го користат скратениот формат на URL youtu.be</string>
+  <!-- misc.debugging.enableDebuggingPatch -->
+  <string name="morphe_debug_protobuffer_summary">Додава дополнителни информации за евидентира ње за програмери за да ги идентификуваат компонентите на апликацијата</string>
+  <!-- Custom filter -->
+  <!-- 'Component path builder strings' is the technical name for identifying the Litho UI layout items to hide. This is an advanced feature and most users will never use this. -->
+  <!-- misc.spoof.appversion.spoofAppVersionPatch -->
 </resources>

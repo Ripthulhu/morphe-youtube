@@ -3,18 +3,15 @@
 package app.morphe.patches.youtube.video.information
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.InstructionLocation.MatchAfterImmediately
 import app.morphe.patcher.InstructionLocation.MatchAfterWithin
 import app.morphe.patcher.OpcodesFilter
 import app.morphe.patcher.StringComparisonType
 import app.morphe.patcher.anyInstruction
-import app.morphe.patcher.fieldAccess
 import app.morphe.patcher.literal
 import app.morphe.patcher.methodCall
 import app.morphe.patcher.opcode
 import app.morphe.patcher.string
 import app.morphe.patches.youtube.shared.PlaybackSpeedOnItemClickParentFingerprint
-import app.morphe.patches.youtube.shared.VideoQualityChangedFingerprint
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 
@@ -24,13 +21,6 @@ internal object PlaybackSpeedOnItemClickFingerprint : Fingerprint(
     accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
     returnType = "V",
     parameters = listOf("L", "L", "I", "J")
-)
-
-internal object PlayerControllerSetTimeReferenceFingerprint : Fingerprint(
-    filters = OpcodesFilter.opcodesToFilters(
-        Opcode.INVOKE_DIRECT_RANGE, Opcode.IGET_OBJECT
-    ),
-    strings = listOf("Media progress reported outside media playback: ")
 )
 
 internal object PlayerInitFingerprint : Fingerprint(
@@ -162,16 +152,6 @@ internal object GetVideoTimeFingerprint : Fingerprint(
     )
 )
 
-internal object PlaybackSpeedMenuSpeedChangedFingerprint : Fingerprint(
-    classFingerprint = VideoQualityChangedFingerprint,
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
-    returnType = "L",
-    parameters = listOf("L"),
-    filters = listOf(
-        fieldAccess(opcode = Opcode.IGET, type = "F")
-    )
-)
-
 internal object PlaybackSpeedClassFingerprint : Fingerprint(
     accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
     returnType = "L",
@@ -233,3 +213,4 @@ internal object SetVideoQualityFingerprint : Fingerprint(
         Opcode.IGET_OBJECT,
     )
 )
+

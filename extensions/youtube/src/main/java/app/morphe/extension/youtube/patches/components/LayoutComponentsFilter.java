@@ -5,7 +5,7 @@
  * Original hard forked code:
  * https://github.com/ReVanced/revanced-patches/commit/724e6d61b2ecd868c1a9a37d465a688e83a74799
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to Morphe contributions.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to Morphe contributions.
  */
 
 package app.morphe.extension.youtube.patches.components;
@@ -30,12 +30,17 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.shared.patches.components.BufferAsciiStrings;
+import app.morphe.extension.shared.patches.components.ByteArrayFilterGroup;
+import app.morphe.extension.shared.patches.components.ByteArrayFilterGroupList;
+import app.morphe.extension.shared.patches.components.ContextInterface;
+import app.morphe.extension.shared.patches.components.Filter;
+import app.morphe.extension.shared.patches.components.StringFilterGroup;
+import app.morphe.extension.shared.patches.components.StringFilterGroupList;
 import app.morphe.extension.shared.StringTrieSearch;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.youtube.patches.ChangeHeaderPatch;
-import app.morphe.extension.youtube.patches.components.LithoFilterPatch.BufferAsciiStrings;
 import app.morphe.extension.youtube.settings.Settings;
-import app.morphe.extension.youtube.shared.ConversionContext.ContextInterface;
 
 @SuppressWarnings("unused")
 public final class LayoutComponentsFilter extends Filter {
@@ -44,13 +49,10 @@ public final class LayoutComponentsFilter extends Filter {
             "cell_description_body",
             "channel_profile"
     );
-    private static final ByteArrayFilterGroup mix8Buffer = new ByteArrayFilterGroup(
+    private static final ByteArrayFilterGroup mixPlaylistUrlBuffer = new ByteArrayFilterGroup(
             null,
-            "Mix8"
-    );
-    private static final ByteArrayFilterGroup playlistListTagBuffer = new ByteArrayFilterGroup(
-            null,
-            "&list="
+            "?list=RD",
+            "&list=RD"
     );
 
     private static final List<String> channelTabFilterStrings = getFilterStrings(Settings.HIDE_CHANNEL_TAB_FILTER_STRINGS);
@@ -64,7 +66,6 @@ public final class LayoutComponentsFilter extends Filter {
     private final StringFilterGroup singleItemInformationPanel;
     private static final AtomicInteger singleItemInformationPanelIndex = new AtomicInteger(-1);
     private final StringFilterGroup expandableMetadata;
-    private final ByteArrayFilterGroup productCardBuffer;
     private final ByteArrayFilterGroup summaryCardBuffer;
     private final StringFilterGroup compactChannelBarInner;
     private final StringFilterGroup compactChannelBarInnerButton;
@@ -77,9 +78,7 @@ public final class LayoutComponentsFilter extends Filter {
 
     public enum ExpandableCardStyle {
         SHOW_ALL,
-        HIDE_PRODUCT_ONLY,
         HIDE_SUMMARY_ONLY,
-        HIDE_PRODUCT_AND_SUMMARY,
         HIDE_ALL
     }
 
@@ -158,7 +157,7 @@ public final class LayoutComponentsFilter extends Filter {
         );
 
         final var subscriptionsChipBar = new StringFilterGroup(
-                Settings.HIDE_FILTER_BAR_FEED_IN_FEED,
+                Settings.HIDE_FILTER_BAR_IN_FEED,
                 "subscriptions_chip_bar"
         );
 
@@ -168,7 +167,7 @@ public final class LayoutComponentsFilter extends Filter {
         );
 
         chipBar = new StringFilterGroup(
-                Settings.HIDE_FILTER_BAR_FEED_IN_HISTORY,
+                Settings.HIDE_FILTER_BAR_IN_HISTORY,
                 "chip_bar"
         );
 
@@ -235,11 +234,6 @@ public final class LayoutComponentsFilter extends Filter {
                 "expandable_metadata"
         );
 
-        productCardBuffer = new ByteArrayFilterGroup(
-                null,
-                "gstatic.com/shopping"
-        );
-
         summaryCardBuffer = new ByteArrayFilterGroup(
                 null,
                 "PAfeedback_genai"
@@ -301,6 +295,11 @@ public final class LayoutComponentsFilter extends Filter {
         final var videoRecommendationLabels = new StringFilterGroup(
                 Settings.HIDE_VIDEO_RECOMMENDATION_LABELS,
                 "endorsement_header_footer.e"
+        );
+
+        final var videoThumbnail = new StringFilterGroup(
+                Settings.HIDE_VIDEO_THUMBNAIL,
+                "video_lockup_thumbnail.e"
         );
 
         final var videoTitle = new StringFilterGroup(
@@ -385,6 +384,7 @@ public final class LayoutComponentsFilter extends Filter {
                 subscriptionsChipBar,
                 surveys,
                 timedReactions,
+                videoThumbnail,
                 videoLabels,
                 videoTitle,
                 videoRecommendationLabels,
@@ -393,15 +393,21 @@ public final class LayoutComponentsFilter extends Filter {
     }
 
     @Override
-    boolean isFiltered(ContextInterface contextInterface,
-                       String identifier,
-                       String accessibility,
-                       String path,
-                       byte[] buffer,
-                       BufferAsciiStrings asciiStrings,
-                       StringFilterGroup matchedGroup,
-                       FilterContentType contentType,
-                       int contentIndex) {
+    public boolean isFiltered(ContextInterface contextInterface,
+                              String identifier,
+                              String accessibility,
+                              String path,
+                              byte[] buffer,
+                              BufferAsciiStrings asciiStrings,
+                              StringFilterGroup matchedGroup,
+                              FilterContentType contentType,
+                              int contentIndex) {
+        // The groups are excluded from the filter due to the exceptions list below.
+        // Filter them separately here.
+        if (matchedGroup == notifyMe || matchedGroup == surveys) {
+            return true;
+        }
+
         // Exceptions are not filtered.
         if (exceptions.matches(path)) {
             return false;
@@ -429,27 +435,14 @@ public final class LayoutComponentsFilter extends Filter {
             }
         }
 
-        // The groups are excluded from the filter due to the exceptions list below.
-        // Filter them separately here.
-        if (matchedGroup == notifyMe || matchedGroup == surveys) {
-            return true;
-        }
-
         if (matchedGroup == expandableMetadata) {
             ExpandableCardStyle style = Settings.HIDE_EXPANDABLE_CARD.get();
             switch (style) {
                 case HIDE_ALL -> {
                     return true;
                 }
-                case HIDE_PRODUCT_ONLY -> {
-                    return productCardBuffer.check(buffer).isFiltered();
-                }
                 case HIDE_SUMMARY_ONLY -> {
                     return summaryCardBuffer.check(buffer).isFiltered();
-                }
-                case HIDE_PRODUCT_AND_SUMMARY -> {
-                    return summaryCardBuffer.check(buffer).isFiltered()
-                            || productCardBuffer.check(buffer).isFiltered();
                 }
                 default -> {
                     return false;
@@ -499,8 +492,7 @@ public final class LayoutComponentsFilter extends Filter {
             }
 
             if (!mixPlaylistsBuffersExceptions.check(buffer).isFiltered() &&
-                    mix8Buffer.check(buffer).isFiltered() &&
-                    playlistListTagBuffer.check(buffer).isFiltered()) {
+                    mixPlaylistUrlBuffer.check(buffer).isFiltered()) {
                 Logger.printDebug(() -> "Filtered mix playlist");
                 return true;
             }
@@ -550,7 +542,7 @@ public final class LayoutComponentsFilter extends Filter {
      * Injection point.
      */
     public static int hideInFeed(final int height) {
-        return Settings.HIDE_FILTER_BAR_FEED_IN_FEED.get()
+        return Settings.HIDE_FILTER_BAR_IN_FEED.get()
                 ? 0
                 : height;
     }
@@ -559,19 +551,19 @@ public final class LayoutComponentsFilter extends Filter {
      * Injection point.
      */
     public static int hideInSearch(int height) {
-        return Settings.HIDE_FILTER_BAR_FEED_IN_SEARCH.get()
+        return Settings.HIDE_FILTER_BAR_IN_SEARCH.get()
                 ? 0
                 : height;
     }
 
-    private static final boolean HIDE_FILTER_BAR_FEED_IN_RELATED_VIDEOS_ENABLED
-            = Settings.HIDE_FILTER_BAR_FEED_IN_RELATED_VIDEOS.get();
+    private static final boolean HIDE_FILTER_BAR_IN_RELATED_VIDEOS_ENABLED
+            = Settings.HIDE_FILTER_BAR_IN_RELATED_VIDEOS.get();
 
     /**
      * Injection point.
      */
     public static int hideInRelatedVideos(int height) {
-        return HIDE_FILTER_BAR_FEED_IN_RELATED_VIDEOS_ENABLED
+        return HIDE_FILTER_BAR_IN_RELATED_VIDEOS_ENABLED
                 ? 0
                 : height;
     }
@@ -580,14 +572,14 @@ public final class LayoutComponentsFilter extends Filter {
      * Injection point.
      */
     public static boolean hideInRelatedVideos(boolean original) {
-        return HIDE_FILTER_BAR_FEED_IN_RELATED_VIDEOS_ENABLED || original;
+        return HIDE_FILTER_BAR_IN_RELATED_VIDEOS_ENABLED || original;
     }
 
     /**
      * Injection point.
      */
     public static void hideInRelatedVideos(View chipView) {
-        Utils.hideViewUnderCondition(HIDE_FILTER_BAR_FEED_IN_RELATED_VIDEOS_ENABLED, chipView);
+        Utils.hideViewUnderCondition(HIDE_FILTER_BAR_IN_RELATED_VIDEOS_ENABLED, chipView);
     }
 
     private static final boolean HIDE_YOUTUBE_DOODLES_ENABLED = Settings.HIDE_YOUTUBE_DOODLES.get();
@@ -784,6 +776,7 @@ public final class LayoutComponentsFilter extends Filter {
 
         for (String filter : flyoutMenuFilterStrings) {
             if (menuTitleString.equalsIgnoreCase(filter)) {
+                Logger.printDebug(() -> "Hiding: " + menuTitleString);
                 return null;
             }
         }
@@ -810,6 +803,7 @@ public final class LayoutComponentsFilter extends Filter {
 
         for (String filter : flyoutMenuFilterStrings) {
             if (menuTitleString.equalsIgnoreCase(filter)) {
+                Logger.printDebug(() -> "Hiding: " + menuTitleString);
                 Utils.hideViewByLayoutParams(parentView);
             }
         }

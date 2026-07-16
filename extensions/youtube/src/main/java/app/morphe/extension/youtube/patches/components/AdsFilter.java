@@ -5,7 +5,7 @@
  * Original hard forked code:
  * https://github.com/ReVanced/revanced-patches/commit/724e6d61b2ecd868c1a9a37d465a688e83a74799
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to Morphe contributions.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to Morphe contributions.
  */
 
 package app.morphe.extension.youtube.patches.components;
@@ -20,9 +20,12 @@ import app.morphe.extension.shared.ByteTrieSearch;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.StringTrieSearch;
 import app.morphe.extension.shared.Utils;
-import app.morphe.extension.youtube.patches.components.LithoFilterPatch.BufferAsciiStrings;
+import app.morphe.extension.shared.patches.components.BufferAsciiStrings;
+import app.morphe.extension.shared.patches.components.ByteArrayFilterGroup;
+import app.morphe.extension.shared.patches.components.ContextInterface;
+import app.morphe.extension.shared.patches.components.Filter;
+import app.morphe.extension.shared.patches.components.StringFilterGroup;
 import app.morphe.extension.youtube.settings.Settings;
-import app.morphe.extension.youtube.shared.ConversionContext.ContextInterface;
 
 @SuppressWarnings("unused")
 public final class AdsFilter extends Filter {
@@ -47,14 +50,16 @@ public final class AdsFilter extends Filter {
 
     private final StringFilterGroup buyMovieAd;
     private final ByteArrayFilterGroup buyMovieAdBuffer;
+    private final StringFilterGroup productCard;
+    private final ByteArrayFilterGroup productCardBuffer;
 
     public AdsFilter() {
         exceptions.addPatterns(
-                "home_video_with_context", // Don't filter anything in the home page video component.
-                "related_video_with_context", // Don't filter anything in the related video component.
-                "comment_thread", // Don't filter anything in the comments.
                 "|comment.", // Don't filter anything in the comments replies.
-                "library_recent_shelf"
+                "comment_thread", // Don't filter anything in the comments.
+                "home_video_with_context", // Don't filter anything in the home page video component.
+                "library_recent_shelf",
+                "related_video_with_context" // Don't filter anything in the related video component.
         );
 
         // Identifiers.
@@ -80,15 +85,16 @@ public final class AdsFilter extends Filter {
                 "compact_landscape_image_layout", // Tablet layout search results.
                 "composite_concurrent_carousel_layout",
                 "full_width_portrait_image_layout",
+                // full_width_square_image_button_group_layout, landscape_image_button_group_layout, text_image_button_group_layout
                 "full_width_square_image_carousel_layout",
                 "full_width_square_image_layout",
                 "hero_promo_image",
-                // text_image_button_group_layout, landscape_image_button_group_layout, full_width_square_image_button_group_layout
                 "image_button_group_layout",
                 "landscape_image_carousel_layout",
                 "landscape_image_wide_button_layout",
                 "primetime_promo",
                 "product_details",
+                "shopping_timely_shelf.", // Injection point below hides the empty space.
                 "square_image_layout",
                 "text_image_button_layout",
                 "text_image_no_button_layout", // Tablet layout search results.
@@ -97,8 +103,7 @@ public final class AdsFilter extends Filter {
                 "video_display_carousel_buttoned_short_dr_layout",
                 "video_display_full_buttoned_short_dr_layout",
                 "video_display_full_layout",
-                "watch_metadata_app_promo",
-                "shopping_timely_shelf." // Injection point below hides the empty space.
+                "watch_metadata_app_promo"
         );
 
         final var movieAds = new StringFilterGroup(
@@ -123,13 +128,14 @@ public final class AdsFilter extends Filter {
 
         final var viewProducts = new StringFilterGroup(
                 Settings.HIDE_PLAYER_POPUP_ADS,
-                "product_item",
                 "products_in_video",
+                "product_item",
                 "shopping_overlay.e" // Video player overlay shopping links.
         );
 
         final var shoppingLinks = new StringFilterGroup(
                 Settings.HIDE_SHOPPING_LINKS,
+                "shopping_description_item.e",
                 "shopping_description_shelf.e"
         );
 
@@ -146,10 +152,20 @@ public final class AdsFilter extends Filter {
                 "shorts_disclosures.e"
         );
 
+        productCard = new StringFilterGroup(
+                Settings.HIDE_SHOPPING_LINKS,
+                "expandable_metadata.e"
+        );
+
+        productCardBuffer = new ByteArrayFilterGroup(
+                null,
+                STORE_BANNER_DOMAIN
+        );
+
         final var productSticker = new StringFilterGroup(
                 Settings.HIDE_PLAYER_POPUP_ADS,
-                "stickers_layer.e",
-                "product_sticker.e" // Product sticker that appears on Shorts.
+                "product_sticker.e", // Product sticker that appears on Shorts.
+                "stickers_layer.e"
         );
 
         final var selfSponsor = new StringFilterGroup(
@@ -163,6 +179,7 @@ public final class AdsFilter extends Filter {
                 merchandise,
                 movieAds,
                 paidPromotionLabel,
+                productCard,
                 productSticker,
                 selfSponsor,
                 shoppingLinks,
@@ -171,17 +188,25 @@ public final class AdsFilter extends Filter {
     }
 
     @Override
-    boolean isFiltered(ContextInterface contextInterface,
-                       String identifier,
-                       String accessibility,
-                       String path,
-                       byte[] buffer,
-                       BufferAsciiStrings asciiStrings,
-                       StringFilterGroup matchedGroup,
-                       FilterContentType contentType,
-                       int contentIndex) {
+    public boolean isFiltered(ContextInterface contextInterface,
+                              String identifier,
+                              String accessibility,
+                              String path,
+                              byte[] buffer,
+                              BufferAsciiStrings asciiStrings,
+                              StringFilterGroup matchedGroup,
+                              FilterContentType contentType,
+                              int contentIndex) {
+        if (contentType == FilterContentType.IDENTIFIER) {
+            return true;
+        }
+
         if (matchedGroup == buyMovieAd) {
             return contentIndex == 0 && buyMovieAdBuffer.check(buffer).isFiltered();
+        }
+
+        if (matchedGroup == productCard) {
+            return productCardBuffer.check(buffer).isFiltered();
         }
 
         return !exceptions.matches(path);
@@ -282,5 +307,21 @@ public final class AdsFilter extends Filter {
      */
     public static void hideMiniplayerPaidPromotionLabelView(View view) {
         Utils.hideViewBy0dpUnderCondition(Settings.HIDE_PAID_PROMOTION_LABEL, view);
+    }
+
+    /**
+     * Injection point.
+     */
+    public static boolean hideVideoAds() {
+        return Settings.HIDE_VIDEO_ADS.get();
+    }
+
+    /**
+     * Injection point.
+     */
+    public static String hideVideoAds(String osName) {
+        return Settings.HIDE_VIDEO_ADS.get()
+                ? "Android Automotive"
+                : osName;
     }
 }

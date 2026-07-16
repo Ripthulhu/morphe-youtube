@@ -21,6 +21,7 @@ import app.morphe.extension.shared.settings.BaseActivityHook;
  * Hooks {@code com.google.android.gms.common.api.GoogleApiActivity}
  * to inject a custom {@link MusicPreferenceFragment} with a toolbar and search.
  */
+@SuppressWarnings({"deprecation", "RedundantSuppression"})
 public class MusicActivityHook extends BaseActivityHook {
 
     @SuppressLint("StaticFieldLeak")
@@ -49,7 +50,7 @@ public class MusicActivityHook extends BaseActivityHook {
         // Must touch the Music settings to ensure the settings class is loaded and
         // the values can be found when setting the UI preferences.
         // Logging anything under non debug ensures this is set.
-        Logger.printInfo(() -> "Permanent repeat enabled: " + Settings.PERMANENT_REPEAT.get());
+        Logger.printInfo(() -> "Remember repeat state enabled: " + Settings.REMEMBER_REPEAT_STATE.get());
 
         // YT Music always uses dark mode.
         Utils.setIsDarkModeEnabled(true);

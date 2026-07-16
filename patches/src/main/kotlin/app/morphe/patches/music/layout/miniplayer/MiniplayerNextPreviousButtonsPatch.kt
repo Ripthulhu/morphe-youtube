@@ -2,7 +2,7 @@
  * Copyright 2026 Morphe.
  * https://github.com/MorpheApp/morphe-patches
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to this code.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to this code.
  */
 
 package app.morphe.patches.music.layout.miniplayer
@@ -113,7 +113,7 @@ val miniplayerPreviousNextButtonsPatch = bytecodePatch(
             }
         }
 
-        // region 2 — onFinishInflate: store button views and extend the view array.
+        // region 2 - onFinishInflate: store button views and extend the view array.
         // Anchor: play/pause literal if present, otherwise the first const before NEW_ARRAY.
         // View array is passed to a layout helper via INVOKE_STATIC or INVOKE_DIRECT depending on the build.
         MppWatchWhileLayoutFingerprint.let {

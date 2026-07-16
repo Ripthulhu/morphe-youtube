@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.youtube.patches.voiceovertranslation.VoiceOverTranslationPatch;
 import app.morphe.extension.youtube.shared.Event;
 import app.morphe.extension.youtube.shared.ShortsPlayerState;
 import app.morphe.extension.youtube.shared.VideoState;
@@ -55,6 +56,7 @@ public final class VideoInformation {
     private static final String VIDEO_QUALITY_PREMIUM_NAME = "Premium";
 
     private static final float DEFAULT_YOUTUBE_PLAYBACK_SPEED = 1.0f;
+    public static boolean savePlaybackSpeed = false;
     /**
      * Prefix present in all Short player parameters signature.
      */
@@ -129,6 +131,7 @@ public final class VideoInformation {
         try {
             Logger.printDebug(() -> "newVideoStarted");
 
+            savePlaybackSpeed = false;
             playerControllerRef = new WeakReference<>(Objects.requireNonNull(playerController));
             videoLength = 0;
             channelId = "";
@@ -143,6 +146,13 @@ public final class VideoInformation {
         } catch (Exception ex) {
             Logger.printException(() -> "initialize failure", ex);
         }
+    }
+
+    /**
+     * Injection point.
+     */
+    public static void enableSavePlaybackSpeed() {
+        Utils.runOnMainThreadDelayed(() -> savePlaybackSpeed = true, 500);
     }
 
     /**
@@ -313,7 +323,10 @@ public final class VideoInformation {
             if (controller == null) {
                 Logger.printDebug(() -> "Cannot seekTo because player controller is null");
             } else {
-                if (controller.patch_seekTo(adjustedSeekTime)) return true;
+                if (controller.patch_seekTo(adjustedSeekTime)) {
+                    VoiceOverTranslationPatch.onVideoSeeked();
+                    return true;
+                }
                 Logger.printDebug(() -> "seekTo did not succeeded. Trying MXD.");
                 // Else the video is loading or changing videos, or video is casting to a different device.
             }
@@ -333,7 +346,9 @@ public final class VideoInformation {
                 return false;
             }
 
-            return controller.patch_seekTo(adjustedSeekTime);
+            final boolean mdxSeekSuccessful = controller.patch_seekTo(adjustedSeekTime);
+            if (mdxSeekSuccessful) VoiceOverTranslationPatch.onVideoSeeked();
+            return mdxSeekSuccessful;
         } catch (Exception ex) {
             Logger.printException(() -> "seekTo failure", ex);
             return false;

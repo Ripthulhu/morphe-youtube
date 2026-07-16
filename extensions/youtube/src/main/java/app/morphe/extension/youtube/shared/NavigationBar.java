@@ -5,12 +5,12 @@
  * Original hard forked code:
  * https://github.com/ReVanced/revanced-patches/commit/724e6d61b2ecd868c1a9a37d465a688e83a74799
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to Morphe contributions.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to Morphe contributions.
  */
 
 package app.morphe.extension.youtube.shared;
 
-import static app.morphe.extension.youtube.patches.spoof.SpoofAppVersionPatch.isSpoofingToLessThan;
+import static app.morphe.extension.shared.spoof.SpoofAppVersionPatch.isSpoofingToLessThan;
 import static app.morphe.extension.youtube.shared.NavigationBar.NavigationButton.CREATE;
 
 import android.app.Activity;

@@ -2,7 +2,7 @@
  * Copyright 2026 Morphe.
  * https://github.com/MorpheApp/morphe-patches
  *
- * See the included NOTICE file for GPLv3 §7(b) and §7(c) terms that apply to this code.
+ * See the included NOTICE file for GPLv3 Section 7 terms that apply to this code.
  */
 
 package app.morphe.extension.shared.spoof.js.nsigsolver.impl;
@@ -20,6 +20,8 @@ import java.util.concurrent.Executors;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.shared.settings.BaseSettings;
+import app.morphe.extension.shared.spoof.js.JavaScriptEngineSupport;
 import app.morphe.extension.shared.spoof.js.nsigsolver.common.CacheError;
 import app.morphe.extension.shared.spoof.js.nsigsolver.common.ScriptUtils;
 import app.morphe.extension.shared.spoof.js.nsigsolver.provider.JsChallengeProviderError;
@@ -137,8 +139,10 @@ public class JsEngineChallengeProvider extends JsRuntimeChalBaseJCP {
                 Logger.printException(() -> message);
                 throw new JsChallengeProviderError(message);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            Throwable cause = e.getCause();
+        } catch (InterruptedException | ExecutionException ex) {
+            JavaScriptEngineSupport.setDeviceSupportsJsEngine(false);
+
+            Throwable cause = ex.getCause();
             if (cause instanceof ExecutionException innerExec) {
                 cause = innerExec.getCause();
             }
@@ -147,14 +151,20 @@ public class JsEngineChallengeProvider extends JsRuntimeChalBaseJCP {
                     try {
                         cacheService.clear(CACHE_SECTION);
                     } catch (CacheError ce) {
-                        // ignore
+                        Logger.printDebug(() -> "Ignoring clear cache error", ce);
                     }
                 }
-                Logger.printException(() -> "JavaScript engine error, warmup: " + warmup, jsError);
+                // Initial JavaScript sandbox check can incorrectly pass on some weird devices.
+                String message = "JavaScript engine error, warmup: " + warmup;
+                if (BaseSettings.DEBUG.get()) {
+                    Logger.printException(() -> message, jsError);
+                } else {
+                    Logger.printInfo(() -> message, jsError);
+                }
                 throw new JsChallengeProviderError("JavaScript engine error: " + jsError.getMessage(), jsError);
             }
-            Logger.printException(() -> "Execution failed, warmup: " + warmup, e);
-            throw new JsChallengeProviderError("Execution failed", e);
+            Logger.printException(() -> "Execution failed, warmup: " + warmup, ex);
+            throw new JsChallengeProviderError("Execution failed", ex);
         }
     }
 
