@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 
@@ -74,9 +75,15 @@ public final class YouTubeControlReceiver extends BroadcastReceiver {
         if (intent == null || !ACTION_MEDIA_START.equals(intent.getAction())) return;
 
         String query = buildQuery(intent);
-        ResultReceiver callback = getCallback(intent);
+        ResultReceiver callback = getLegacyCallback(intent);
+        boolean ordered = isOrderedBroadcast();
         if (query.isEmpty()) {
-            sendError(callback, "query_required");
+            Bundle result = errorResult("query_required");
+            sendLegacyResult(callback, CALLBACK_ERROR, result);
+            if (ordered) {
+                setResultCode(CALLBACK_ERROR);
+                setResultExtras(result);
+            }
             return;
         }
 
@@ -86,25 +93,28 @@ public final class YouTubeControlReceiver extends BroadcastReceiver {
             try {
                 String videoId = resolveFirstVideoId(query);
                 if (videoId == null) {
-                    sendError(callback, "no_video_result");
-                    if (callback == null) openSearch(applicationContext, query);
+                    sendResult(callback, pendingResult, ordered, CALLBACK_ERROR,
+                            errorResult("no_video_result"));
+                    if (!ordered && callback == null) openSearch(applicationContext, query);
                     return;
                 }
 
                 String watchUri = WATCH_URL + videoId;
-                if (callback != null) {
+                if (ordered || callback != null) {
                     Bundle result = new Bundle();
                     result.putString(RESULT_VIDEO_ID, videoId);
                     result.putString(RESULT_URI, watchUri);
-                    callback.send(CALLBACK_OK, result);
+                    sendResult(callback, pendingResult, ordered, CALLBACK_OK, result);
                 } else {
                     openUri(applicationContext, watchUri);
                 }
                 Logger.printDebug(() -> "YouTube control resolved query to: " + videoId);
             } catch (Exception exception) {
-                sendError(callback, "resolve_failed");
-                if (callback == null) openSearch(applicationContext, query);
-                Logger.printException(() -> "YouTube control request failed", exception);
+                sendResult(callback, pendingResult, ordered, CALLBACK_ERROR,
+                        errorResult("resolve_failed"));
+                if (!ordered && callback == null) openSearch(applicationContext, query);
+                Logger.printDebug(() -> "YouTube control resolver unavailable: " +
+                        exception.getClass().getSimpleName());
             } finally {
                 pendingResult.finish();
             }
@@ -138,11 +148,17 @@ public final class YouTubeControlReceiver extends BroadcastReceiver {
     }
 
     @Nullable
-    private static ResultReceiver getCallback(@NonNull Intent intent) {
+    private static ResultReceiver getLegacyCallback(@NonNull Intent intent) {
+        if (!intent.hasExtra(EXTRA_CALLBACK)) return null;
+
         try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                return intent.getParcelableExtra(EXTRA_CALLBACK, ResultReceiver.class);
+            }
             return intent.getParcelableExtra(EXTRA_CALLBACK);
         } catch (RuntimeException exception) {
-            Logger.printException(() -> "Invalid YouTube control callback", exception);
+            Logger.printDebug(() -> "Ignoring unavailable legacy callback: " +
+                    exception.getClass().getSimpleName());
             return null;
         }
     }
@@ -189,11 +205,40 @@ public final class YouTubeControlReceiver extends BroadcastReceiver {
         return output.toString();
     }
 
-    private static void sendError(@Nullable ResultReceiver callback, @NonNull String error) {
-        if (callback == null) return;
+    @NonNull
+    private static Bundle errorResult(@NonNull String error) {
         Bundle result = new Bundle();
         result.putString(RESULT_ERROR, error);
-        callback.send(CALLBACK_ERROR, result);
+        return result;
+    }
+
+    private static void sendResult(
+            @Nullable ResultReceiver callback,
+            @NonNull PendingResult pendingResult,
+            boolean ordered,
+            int resultCode,
+            @NonNull Bundle result
+    ) {
+        sendLegacyResult(callback, resultCode, result);
+        if (ordered) {
+            pendingResult.setResultCode(resultCode);
+            pendingResult.setResultExtras(result);
+        }
+    }
+
+    private static void sendLegacyResult(
+            @Nullable ResultReceiver callback,
+            int resultCode,
+            @NonNull Bundle result
+    ) {
+        if (callback == null) return;
+
+        try {
+            callback.send(resultCode, result);
+        } catch (RuntimeException exception) {
+            Logger.printDebug(() -> "Ignoring unavailable legacy callback: " +
+                    exception.getClass().getSimpleName());
+        }
     }
 
     private static void openSearch(@NonNull Context context, @NonNull String query) {
