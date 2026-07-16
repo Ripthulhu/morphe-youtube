@@ -1,1 +1,14 @@
-<manifest/>
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <receiver
+            android:name="app.morphe.extension.music.patches.YouTubeMusicControlReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="app.morphe.youtube.music.api.MEDIA_START" />
+                <action android:name="app.morphe.youtube.music.api.MEDIA_COMMAND" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
