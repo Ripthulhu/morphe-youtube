@@ -1,3 +1,9 @@
+## [1.36.2](https://github.com/Ripthulhu/morphe-youtube/compare/v1.36.1...v1.36.2) (2026-07-17)
+
+### 🐛 Bug Fixes
+
+* **keep:** preserve original package name ([b92f345](https://github.com/Ripthulhu/morphe-youtube/commit/b92f34522f69f784efc6c98a52264c16e35c4a1a))
+
 ## [1.36.1](https://github.com/Ripthulhu/morphe-youtube/compare/v1.36.0...v1.36.1) (2026-07-17)
 
 ### 🐛 Bug Fixes

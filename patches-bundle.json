@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-17T17:30:00",
-  "description": "## [1.36.1](https://github.com/Ripthulhu/morphe-youtube/compare/v1.36.0...v1.36.1) (2026-07-17)\n\n### 🐛 Bug Fixes\n\n* **keep:** add MicroG-RE login support ([cb55da9](https://github.com/Ripthulhu/morphe-youtube/commit/cb55da9779b1e8fa5645b1df37c7d50f83d939f3))",
-  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.36.1/patches-1.36.1.mpp",
+  "created_at": "2026-07-17T18:01:55",
+  "description": "## [1.36.2](https://github.com/Ripthulhu/morphe-youtube/compare/v1.36.1...v1.36.2) (2026-07-17)\n\n### 🐛 Bug Fixes\n\n* **keep:** preserve original package name ([b92f345](https://github.com/Ripthulhu/morphe-youtube/commit/b92f34522f69f784efc6c98a52264c16e35c4a1a))",
+  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.36.2/patches-1.36.2.mpp",
   "signature_download_url": "",
-  "version": "1.36.1"
+  "version": "1.36.2"
 }
