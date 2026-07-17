@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.35.0",
+  "version": "1.36.0",
   "patches": [
     {
       "name": "AI playback API",
@@ -6220,6 +6220,39 @@
             {
               "version": "7.29.52",
               "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 26,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Mythara Keep API",
+      "description": "Adds a private API bridge for Mythara to read and manage Google Keep documents.",
+      "default": false,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.google.android.keep",
+          "name": "Google Keep",
+          "description": null,
+          "apkFileType": "APK_REQUIRED",
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "5.26.281.02.90",
+              "versionCodes": {
+                "ARM64_V8A": 220667747,
+                "ARMEABI_V7A": 220667747,
+                "X86_64": 220667747,
+                "X86": 220667747
+              },
               "isExperimental": false,
               "minSdk": 26,
               "description": null

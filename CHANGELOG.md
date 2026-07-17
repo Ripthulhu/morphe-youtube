@@ -1,3 +1,9 @@
+## [1.36.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.35.0...v1.36.0) (2026-07-17)
+
+### ✨ New Features
+
+* **keep:** add Mythara notes API patch ([605288b](https://github.com/Ripthulhu/morphe-youtube/commit/605288ba008ce3a27501161cbdf30da352fd2b5d))
+
 ## [1.35.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.34.0...v1.35.0) (2026-07-16)
 
 ### 🐛 Bug Fixes
