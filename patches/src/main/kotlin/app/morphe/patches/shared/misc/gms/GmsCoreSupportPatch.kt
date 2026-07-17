@@ -60,7 +60,7 @@ internal const val GMS_CORE_VENDOR_GROUP_ID = "app.revanced"
  * @param toPackageNameDefault The package name to fall back to if no custom package name is specified in patch options.
  * @param primeMethodFingerprint The fingerprint of the "prime" method that needs to be patched.
  * @param earlyReturnFingerprints The fingerprints of methods that need to be returned early.
- * @param mainActivityOnCreateFingerprint The fingerprint of the main activity onCreate method.
+ * @param mainActivityOnCreateFingerprint The optional fingerprint of the main activity onCreate method.
  * @param extensionPatch The patch responsible for the extension.
  * @param executeBlock The additional execution block of the patch.
  * @param block The additional block to build the patch.
@@ -70,7 +70,7 @@ fun gmsCoreSupportPatch(
     toPackageNameDefault: String,
     primeMethodFingerprint: Fingerprint? = null,
     earlyReturnFingerprints: Set<Fingerprint> = setOf(),
-    mainActivityOnCreateFingerprint: Fingerprint,
+    mainActivityOnCreateFingerprint: Fingerprint? = null,
     extensionPatch: Patch<*>,
     gmsCoreSupportResourcePatchFactory: () -> Patch<*>,
     executeBlock: BytecodePatchContext.() -> Unit = {},
@@ -223,7 +223,7 @@ fun gmsCoreSupportPatch(
         OriginalPackageNameExtensionFingerprint.method.returnEarly(fromPackageName)
 
         // Verify GmsCore is installed and whitelisted for power optimizations and background usage.
-        mainActivityOnCreateFingerprint.method.addInstruction(
+        mainActivityOnCreateFingerprint?.method?.addInstruction(
             0,
             "invoke-static/range { p0 .. p0 }, $EXTENSION_CLASS->" +
                     "checkGmsCore(Landroid/app/Activity;)V"
@@ -523,14 +523,12 @@ fun gmsCoreSupportResourcePatch(
     fromPackageName: String,
     toPackageNameDefault: String,
     spoofedPackageSignature: String,
-    screen: BasePreferenceScreen.Screen,
+    screen: BasePreferenceScreen.Screen? = null,
     executeBlock: ResourcePatchContext.() -> Unit = {},
     block: ResourcePatchBuilder.() -> Unit = {},
 ) = resourcePatch {
-    dependsOn(
-        changePackageNamePatch,
-        linkHandlingPatch(fromPackageName, screen)
-    )
+    dependsOn(changePackageNamePatch)
+    screen?.let { dependsOn(linkHandlingPatch(fromPackageName, it)) }
 
     execute {
         val toPackageName = setOrGetFallbackPackageName(toPackageNameDefault)
@@ -600,7 +598,7 @@ fun gmsCoreSupportResourcePatch(
         patchManifest()
         addSpoofingMetadata()
 
-        screen.addPreferences(
+        screen?.addPreferences(
             IntentPreference(
                 "microg_settings",
                 intent = IntentPreference.Intent("", "org.microg.gms.ui.SettingsActivity") {

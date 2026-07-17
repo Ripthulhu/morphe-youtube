@@ -1,7 +1,7 @@
 package app.morphe.patches.keep.api
 
 import app.morphe.patcher.patch.resourcePatch
-import app.morphe.patches.keep.misc.extension.sharedExtensionPatch
+import app.morphe.patches.keep.misc.gms.gmsCoreSupportPatch
 import app.morphe.patches.keep.shared.Constants.COMPATIBILITY_KEEP
 import org.w3c.dom.Element
 
@@ -15,7 +15,7 @@ val keepApiPatch = resourcePatch(
     default = false,
 ) {
     compatibleWith(COMPATIBILITY_KEEP)
-    dependsOn(sharedExtensionPatch)
+    dependsOn(gmsCoreSupportPatch)
 
     execute {
         document("AndroidManifest.xml").use { document ->
