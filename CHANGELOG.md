@@ -1,3 +1,9 @@
+## [1.36.1](https://github.com/Ripthulhu/morphe-youtube/compare/v1.36.0...v1.36.1) (2026-07-17)
+
+### 🐛 Bug Fixes
+
+* **keep:** add MicroG-RE login support ([cb55da9](https://github.com/Ripthulhu/morphe-youtube/commit/cb55da9779b1e8fa5645b1df37c7d50f83d939f3))
+
 ## [1.36.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.35.0...v1.36.0) (2026-07-17)
 
 ### ✨ New Features
