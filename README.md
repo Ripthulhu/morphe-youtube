@@ -215,7 +215,7 @@ All modifications made by Morphe, along with their dates, can be found in the Gi
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [GmsCore support](#gmscore-support) | Allows the app to work without root by using a different package name when patched using a GmsCore instead of Google Play Services. |  |
-| [Mythara Keep API](#mythara-keep-api) | Adds a private API bridge for Mythara to read and manage Google Keep documents. |  |
+| [Voice Assistant Keep API](#voice-assistant-keep-api) | Adds a private API bridge for Voice Assistant to read and manage Google Keep documents. |  |
 
 </details>
 

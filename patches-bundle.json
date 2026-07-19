@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-17T18:01:55",
-  "description": "## [1.36.2](https://github.com/Ripthulhu/morphe-youtube/compare/v1.36.1...v1.36.2) (2026-07-17)\n\n### 🐛 Bug Fixes\n\n* **keep:** preserve original package name ([b92f345](https://github.com/Ripthulhu/morphe-youtube/commit/b92f34522f69f784efc6c98a52264c16e35c4a1a))",
-  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.36.2/patches-1.36.2.mpp",
+  "created_at": "2026-07-19T22:34:00",
+  "description": "## [1.37.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.36.2...v1.37.0) (2026-07-19)\n\n### ✨ Features\n\n* **youtube:** add authenticated Voice Assistant YouTube API provider with verified playback control and now-playing state\n* **music:** add authenticated Voice Assistant YouTube Music API provider with verified transport and volume control\n\n### 🐛 Bug Fixes\n\n* **keep:** point the caller allowlist at app.ripthulhu.voiceassistant and log refused callers",
+  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.37.0/patches-1.37.0.mpp",
   "signature_download_url": "",
-  "version": "1.36.2"
+  "version": "1.37.0"
 }

@@ -10,5 +10,10 @@
                 <action android:name="app.morphe.youtube.music.api.MEDIA_COMMAND" />
             </intent-filter>
         </receiver>
+        <provider
+            android:name="app.morphe.extension.music.api.YouTubeMusicApiProvider"
+            android:authorities="app.morphe.youtube.music.control"
+            android:exported="true"
+            android:grantUriPermissions="false" />
     </application>
 </manifest>
