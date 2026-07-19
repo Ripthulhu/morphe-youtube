@@ -69,13 +69,36 @@ public final class PlaylistRoutes {
             Route.Method.POST, "browse?prettyPrint=false"
     ).compile();
 
+    /**
+     * Path prefix shared by every field kept from the mix/radio playlist panel.
+     */
+    private static final String MIX_RENDERER = "contents.singleColumnWatchNextResults." +
+            "playlist.playlist.contents.playlistPanelVideoRenderer.";
+
+    /**
+     * Mix/radio ({@code RD<videoId>}) playlist panel for a video, on the ANDROID context.
+     *
+     * <p>The mask keeps two things. {@code playerParams} is what the music-video detection in
+     * RememberPlaybackSpeedPatch reads. The id/title/byline/duration fields are what
+     * {@code list_mix} reads; they were added to the same mask rather than given a second route so
+     * that both consumers share one cached request instead of issuing the watch-next call twice.
+     *
+     * <p>Written as explicit comma separated dotted paths rather than the shorter
+     * {@code renderer(a,b,c)} grouping syntax: the grouping form is unverified against this
+     * endpoint, and a mask this route rejects would break the music detection as well.</p>
+     */
     public static final Route.CompiledRoute GET_MIX_PLAYLIST = new Route(
             Route.Method.POST,
             "next" +
-                    "?fields=contents.singleColumnWatchNextResults." +
-                    "playlist.playlist.contents.playlistPanelVideoRenderer." +
+                    "?fields=" + MIX_RENDERER +
                     "navigationEndpoint.coWatchWatchEndpointWrapperCommand." +
-                    "watchEndpoint.watchEndpoint.playerParams&prettyPrint=false"
+                    "watchEndpoint.watchEndpoint.playerParams" +
+                    "," + MIX_RENDERER + "videoId" +
+                    "," + MIX_RENDERER + "title" +
+                    "," + MIX_RENDERER + "longBylineText" +
+                    "," + MIX_RENDERER + "shortBylineText" +
+                    "," + MIX_RENDERER + "lengthText" +
+                    "&prettyPrint=false"
     ).compile();
 
     /**

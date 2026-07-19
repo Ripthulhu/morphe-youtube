@@ -25,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.innertube.utils.AuthUtils;
 import app.morphe.extension.youtube.patches.LoadVideoPatch;
 import app.morphe.extension.youtube.patches.VideoInformation;
+import app.morphe.extension.youtube.patches.utils.requests.GetMixPlaylistRequest;
 import app.morphe.extension.youtube.patches.utils.requests.GetSuggestionsRequest;
 import app.morphe.extension.youtube.shared.PlayerType;
 import app.morphe.extension.youtube.shared.VideoState;
@@ -76,6 +78,8 @@ public final class YouTubeApiProvider extends ContentProvider {
      * than block indefinitely on a slow or absent network.
      */
     private static final long SUGGESTIONS_TIMEOUT_MS = 5_000L;
+    /** Same discipline and budget as {@link #SUGGESTIONS_TIMEOUT_MS}, for the mix fetch. */
+    private static final long MIX_TIMEOUT_MS = 5_000L;
 
     private static final int DEFAULT_SUGGESTION_LIMIT = 5;
     private static final int MAX_SUGGESTION_LIMIT = 20;
@@ -134,6 +138,9 @@ public final class YouTubeApiProvider extends ContentProvider {
                 case "list_suggestions":
                     result = listSuggestions(extras);
                     break;
+                case "list_mix":
+                    result = listMix(extras);
+                    break;
                 default:
                     return failure("VALIDATION", "Unknown method.");
             }
@@ -172,7 +179,8 @@ public final class YouTubeApiProvider extends ContentProvider {
         result.put("api_version", API_VERSION);
         result.put("operations", new JSONArray(Arrays.asList(
                 "capabilities", "state", "open_video", "play", "pause",
-                "next", "previous", "seek", "set_speed", "volume", "list_suggestions")));
+                "next", "previous", "seek", "set_speed", "volume", "list_suggestions",
+                "list_mix")));
 
         JSONObject fields = new JSONObject();
         fields.put("video_id", true);
@@ -199,13 +207,27 @@ public final class YouTubeApiProvider extends ContentProvider {
         notes.put("verified_mutations", true);
         notes.put("verify_timeout_ms", VERIFY_TIMEOUT_MS);
         notes.put("open_timeout_ms", OPEN_TIMEOUT_MS);
-        // Every other operation here is a local read or a media-key dispatch. list_suggestions is
-        // the exception: it performs a network call to InnerTube, so callers should expect latency
-        // (a cold call typically takes a second or more) and must not treat it as instant.
+        // Every other operation here is a local read or a media-key dispatch. The two list
+        // operations are the exception: BOTH perform a network call to InnerTube, so callers should
+        // expect latency (a cold call typically takes a second or more) and must not treat either
+        // as instant. They differ in authentication, and that difference shows in the results:
+        // list_mix is sent with this app's credentials and is personalised; list_suggestions must
+        // be sent anonymously, because its results only parse on the WEB client context and this
+        // app's ANDROID credentials are rejected against that context (HTTP 400, measured on
+        // device). Anonymous related results are noticeably weaker, so prefer list_mix when either
+        // will do. Both replies carry a "source" field naming which list was read.
         notes.put("list_suggestions_network", true);
         notes.put("list_suggestions_timeout_ms", SUGGESTIONS_TIMEOUT_MS);
         notes.put("list_suggestions_default_limit", DEFAULT_SUGGESTION_LIMIT);
         notes.put("list_suggestions_max_limit", MAX_SUGGESTION_LIMIT);
+        notes.put("list_suggestions_authenticated", false);
+        notes.put("list_suggestions_source", "related");
+        notes.put("list_mix_network", true);
+        notes.put("list_mix_timeout_ms", MIX_TIMEOUT_MS);
+        notes.put("list_mix_default_limit", DEFAULT_SUGGESTION_LIMIT);
+        notes.put("list_mix_max_limit", MAX_SUGGESTION_LIMIT);
+        notes.put("list_mix_authenticated", true);
+        notes.put("list_mix_source", "mix");
         result.put("notes", notes);
         return result;
     }
@@ -564,35 +586,137 @@ public final class YouTubeApiProvider extends ContentProvider {
                     + SUGGESTIONS_TIMEOUT_MS + "ms; the request failed or timed out.");
         }
 
+        List<Entry> entries = new ArrayList<>(suggestions.size());
+        for (GetSuggestionsRequest.Suggestion suggestion : suggestions) {
+            entries.add(new Entry(suggestion.videoId, suggestion.title, suggestion.channel,
+                    suggestion.duration));
+        }
+        return renderSuggestionList(sourceVideoId, "related", entries, limit);
+    }
+
+    /**
+     * The mix/radio queue ({@code RD<videoId>}) for the current (or an explicitly named) video.
+     *
+     * <p>Deliberately a separate operation from {@link #listSuggestions}, not a replacement for it,
+     * even though it usually gives better answers. It is a different question: a mix is the queue
+     * YouTube would play next, whereas the related shelf is what it would show alongside. The reply
+     * shape is identical down to the key names and 1-based index, and carries {@code source} so a
+     * caller reading it aloud can say which kind of list it has.</p>
+     *
+     * <p>Unlike {@link #listSuggestions} this one is authenticated: the mix runs on the ANDROID
+     * client context, which is the context this app's credentials were actually issued for, so
+     * sending them is both accepted and personalising. Failure to build those headers degrades to
+     * an anonymous fetch rather than failing the call — a less personalised list beats no list.</p>
+     */
+    private JSONObject listMix(Bundle extras) throws Exception {
+        String requested = optionalString(extras, "video_id", null);
+        if (requested != null && !VIDEO_ID_PATTERN.matcher(requested).matches()) {
+            throw validation("Invalid video_id.");
+        }
+
+        final String sourceVideoId;
+        if (requested != null) {
+            sourceVideoId = requested;
+        } else {
+            String current = VideoInformation.getVideoId();
+            if (current == null || current.isEmpty()) {
+                throw validation("No video is playing; supply video_id to list the mix for a "
+                        + "specific video.");
+            }
+            sourceVideoId = current;
+        }
+
+        int limit = DEFAULT_SUGGESTION_LIMIT;
+        if (has(extras, "limit")) {
+            limit = requiredInt(extras, "limit");
+            if (limit < 1 || limit > MAX_SUGGESTION_LIMIT) {
+                throw validation("Invalid limit; expected 1 to " + MAX_SUGGESTION_LIMIT + ".");
+            }
+        }
+
+        Map<String, String> headers;
+        try {
+            headers = AuthUtils.getRequestHeader();
+        } catch (Exception exception) {
+            // Not fatal. The endpoint serves this request signed out too.
+            Logger.printDebug(() -> "Mix auth headers unavailable, falling back to anonymous: "
+                    + exception.getClass().getSimpleName());
+            headers = Collections.emptyMap();
+        }
+        if (headers == null) headers = Collections.emptyMap();
+        final Map<String, String> requestHeaders = headers;
+
+        List<GetMixPlaylistRequest.MixItem> items =
+                GetMixPlaylistRequest.fetchRequestIfNeeded(sourceVideoId, requestHeaders)
+                        .getMixItems(MIX_TIMEOUT_MS);
+        if (items == null) {
+            // Same reasoning as list_suggestions: the failed request is cached by video id, so drop
+            // it rather than pinning the failure for the lifetime of the process. A timeout or a
+            // network error is UNAVAILABLE, never an empty list — a voice caller must not read
+            // "we could not find out" aloud as "there is nothing".
+            GetMixPlaylistRequest.remove(sourceVideoId, requestHeaders);
+            throw unavailable("The mix for " + sourceVideoId + " could not be fetched within "
+                    + MIX_TIMEOUT_MS + "ms; the request failed or timed out.");
+        }
+
+        List<Entry> entries = new ArrayList<>(items.size());
+        for (GetMixPlaylistRequest.MixItem item : items) {
+            entries.add(new Entry(item.videoId, item.title, item.channel, item.duration));
+        }
+        return renderSuggestionList(sourceVideoId, "mix", entries, limit);
+    }
+
+    /**
+     * Renders either list into one shape, so a caller can read a mix and a related list with the
+     * same code and only has to look at {@code source} to describe which it got.
+     */
+    private JSONObject renderSuggestionList(String sourceVideoId, String source,
+                                            List<Entry> entries, int limit) throws Exception {
         JSONObject result = new JSONObject();
         JSONArray unavailable = new JSONArray();
         result.put("video_id", sourceVideoId);
+        result.put("source", source);
 
         JSONArray array = new JSONArray();
-        final int count = Math.min(limit, suggestions.size());
+        final int count = Math.min(limit, entries.size());
         for (int i = 0; i < count; i++) {
-            GetSuggestionsRequest.Suggestion suggestion = suggestions.get(i);
+            Entry item = entries.get(i);
             JSONObject entry = new JSONObject();
             // 1-based: this is read aloud, and people count from one.
             entry.put("index", i + 1);
-            entry.put("video_id", suggestion.videoId);
+            entry.put("video_id", item.videoId);
             // Named by position so the caller can tell WHICH suggestion lost a field; a bare
             // "title" repeated three times would be useless.
             final String prefix = "suggestions[" + (i + 1) + "].";
             // A null here is a parse miss, not a legitimate "no value", so it is reported as
             // unavailable rather than silently emitted as null.
             putSafeNamed(entry, unavailable, "title", prefix + "title",
-                    () -> parsed(suggestion.title, "title"));
+                    () -> parsed(item.title, "title"));
             putSafeNamed(entry, unavailable, "channel", prefix + "channel",
-                    () -> parsed(suggestion.channel, "channel"));
+                    () -> parsed(item.channel, "channel"));
             putSafeNamed(entry, unavailable, "duration", prefix + "duration",
-                    () -> parsed(suggestion.duration, "duration"));
+                    () -> parsed(item.duration, "duration"));
             array.put(entry);
         }
         result.put("suggestions", array);
-        result.put("total_available", suggestions.size());
+        result.put("total_available", entries.size());
         result.put("unavailable", unavailable);
         return result;
+    }
+
+    /** Source-agnostic list row; the two upstream POJOs are normalised into this before rendering. */
+    private static final class Entry {
+        final String videoId;
+        final String title;
+        final String channel;
+        final String duration;
+
+        Entry(String videoId, String title, String channel, String duration) {
+            this.videoId = videoId;
+            this.title = title;
+            this.channel = channel;
+            this.duration = duration;
+        }
     }
 
     // endregion
