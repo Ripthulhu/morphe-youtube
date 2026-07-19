@@ -1,21 +1,23 @@
-package app.morphe.patches.keep.api
+package app.morphe.patches.music.api
 
 import app.morphe.patcher.patch.resourcePatch
-import app.morphe.patches.keep.misc.gms.gmsCoreSupportPatch
-import app.morphe.patches.keep.shared.Constants.COMPATIBILITY_KEEP
+import app.morphe.patches.music.misc.extension.sharedExtensionPatch
+import app.morphe.patches.music.shared.Constants.COMPATIBILITY_YOUTUBE_MUSIC
 import org.w3c.dom.Element
 
-private const val PROVIDER_CLASS = "app.morphe.extension.keep.api.KeepApiProvider"
-private const val PROVIDER_AUTHORITY = "app.morphe.keep.api"
+private const val PROVIDER_CLASS = "app.morphe.extension.music.api.YouTubeMusicApiProvider"
+private const val PROVIDER_AUTHORITY = "app.morphe.youtube.music.control"
 
 @Suppress("unused")
-val keepApiPatch = resourcePatch(
-    name = "Voice Assistant Keep API",
-    description = "Adds a private API bridge for Voice Assistant to read and manage Google Keep documents.",
+val youTubeMusicApiPatch = resourcePatch(
+    name = "Voice Assistant YouTube Music API",
+    description = "Adds a private, caller-authenticated API bridge for Voice Assistant to read " +
+        "playback state and control YouTube Music playback.",
     default = false,
 ) {
-    compatibleWith(COMPATIBILITY_KEEP)
-    dependsOn(gmsCoreSupportPatch)
+    compatibleWith(COMPATIBILITY_YOUTUBE_MUSIC)
+
+    dependsOn(sharedExtensionPatch)
 
     execute {
         document("AndroidManifest.xml").use { document ->

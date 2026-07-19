@@ -1,6 +1,10 @@
 rootProject.name = "morphe-patches"
 
 pluginManagement {
+    if (System.getenv("MORPHE_LOCAL_BUILDS").equals("true", ignoreCase = true)) {
+        includeBuild("../morphe-build-deps/morphe-patches-gradle-plugin")
+    }
+
     repositories {
         mavenLocal()
         gradlePluginPortal()
@@ -35,11 +39,13 @@ settings {
 
 include(":patches:stub")
 
-// Include morphe-patcher as composite builds if they exist locally
+val localBuildRoot = file("../morphe-build-deps")
+
+// Include morphe-patcher as a composite build when the takeover dependencies exist locally.
 mapOf(
     "morphe-patcher" to "app.morphe:morphe-patcher",
 ).forEach { (libraryPath, libraryName) ->
-    val libDir = file("../$libraryPath")
+    val libDir = localBuildRoot.resolve(libraryPath)
     if (libDir.exists()) {
         includeBuild(libDir) {
             dependencySubstitution {
@@ -49,9 +55,9 @@ mapOf(
     }
 }
 
-// Include morphe-patches-library as composite build if it exists locally.
+// Include morphe-patches-library as a composite build if it exists locally.
 // It is a multi-module project, so each artifact maps to a specific subproject.
-file("../morphe-patches-library").let { libDir ->
+localBuildRoot.resolve("morphe-patches-library").let { libDir ->
     if (libDir.exists()) {
         includeBuild(libDir) {
             dependencySubstitution {

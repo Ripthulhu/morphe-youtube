@@ -11,5 +11,11 @@
                 <action android:name="app.morphe.youtube.api.MEDIA_START" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name="app.morphe.extension.youtube.api.YouTubeApiProvider"
+            android:authorities="app.morphe.youtube.control"
+            android:exported="true"
+            android:grantUriPermissions="false" />
     </application>
 </manifest>

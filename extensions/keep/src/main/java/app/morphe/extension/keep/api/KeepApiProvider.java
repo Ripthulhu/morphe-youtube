@@ -15,6 +15,9 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Process;
+import android.text.TextUtils;
+
+import app.morphe.extension.shared.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,8 +31,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * External bridge for Mythara. It intentionally exposes only {@link #call} and never proxies
- * arbitrary URI operations. Keep's own provider remains the source of truth for storage and sync.
+ * External bridge for Voice Assistant. It intentionally exposes only {@link #call} and never
+ * proxies arbitrary URI operations. Keep's own provider remains the source of truth for storage
+ * and sync.
  */
 public final class KeepApiProvider extends ContentProvider {
     private static final int API_VERSION = 1;
@@ -41,7 +45,7 @@ public final class KeepApiProvider extends ContentProvider {
     private static final String KEEP_PROVIDER_CLASS =
             "com.google.android.apps.keep.shared.provider.KeepProviderImpl";
     private static final Set<String> ALLOWED_PACKAGES = new HashSet<>(Arrays.asList(
-            "com.mythara", "com.mythara.debug"));
+            "app.ripthulhu.voiceassistant"));
     private static final AtomicLong LAST_UUID_TIME = new AtomicLong();
 
     private volatile String internalAuthority;
@@ -422,12 +426,31 @@ public final class KeepApiProvider extends ContentProvider {
 
     private interface ResolverCall<T> { T call() throws Exception; }
 
+    /**
+     * The entire access control for this provider. It is declared exported="true" with no
+     * android:permission, and every method routes through call(), which consults this first.
+     *
+     * Matching is by package name against a compile-time set. That is adequate here but not
+     * self-evidently so: a package name is only an identity while the real owner is installed,
+     * since two apps cannot share one. Signature pinning would close that, at the cost of binding
+     * this APK to a specific signing key — worth doing once the caller has a stable release key,
+     * not while it is signed with a regenerable debug keystore.
+     *
+     * The rejection is logged with the package that was refused. Without it a stale allowlist is
+     * indistinguishable from a broken provider from the caller's side: every method returns the
+     * same FORBIDDEN, and finding the cause means decompiling the installed APK.
+     */
     private boolean isAllowedCaller() {
         int uid = Binder.getCallingUid();
         if (uid == Process.myUid()) return true;
         String[] packages = getContext().getPackageManager().getPackagesForUid(uid);
-        if (packages == null) return false;
+        if (packages == null) {
+            Logger.printDebug(() -> "Keep API refused uid " + Binder.getCallingUid() + ": no packages for uid");
+            return false;
+        }
         for (String packageName : packages) if (ALLOWED_PACKAGES.contains(packageName)) return true;
+        final String refused = TextUtils.join(",", packages);
+        Logger.printDebug(() -> "Keep API refused " + refused + "; allowed: " + TextUtils.join(",", ALLOWED_PACKAGES));
         return false;
     }
 

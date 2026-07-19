@@ -6265,39 +6265,6 @@
       "options": []
     },
     {
-      "name": "Mythara Keep API",
-      "description": "Adds a private API bridge for Mythara to read and manage Google Keep documents.",
-      "default": false,
-      "dependencies": [
-        "BytecodePatch"
-      ],
-      "compatiblePackages": [
-        {
-          "packageName": "com.google.android.keep",
-          "name": "Google Keep",
-          "description": null,
-          "apkFileType": "APK_REQUIRED",
-          "appIconColor": null,
-          "signatures": null,
-          "targets": [
-            {
-              "version": "5.26.281.02.90",
-              "versionCodes": {
-                "ARM64_V8A": 220667747,
-                "ARMEABI_V7A": 220667747,
-                "X86_64": 220667747,
-                "X86": 220667747
-              },
-              "isExperimental": false,
-              "minSdk": 26,
-              "description": null
-            }
-          ]
-        }
-      ],
-      "options": []
-    },
-    {
       "name": "Navigation bar",
       "description": "Adds options to hide navigation bar, labels and buttons.",
       "default": true,
@@ -9625,6 +9592,39 @@
             {
               "version": "20.21.37",
               "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 26,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Voice Assistant Keep API",
+      "description": "Adds a private API bridge for Voice Assistant to read and manage Google Keep documents.",
+      "default": false,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.google.android.keep",
+          "name": "Google Keep",
+          "description": null,
+          "apkFileType": "APK_REQUIRED",
+          "appIconColor": null,
+          "signatures": null,
+          "targets": [
+            {
+              "version": "5.26.281.02.90",
+              "versionCodes": {
+                "ARM64_V8A": 220667747,
+                "ARMEABI_V7A": 220667747,
+                "X86_64": 220667747,
+                "X86": 220667747
+              },
               "isExperimental": false,
               "minSdk": 26,
               "description": null
