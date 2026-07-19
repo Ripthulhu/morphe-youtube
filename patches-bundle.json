@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-20T00:15:00",
-  "description": "## [1.37.1](https://github.com/Ripthulhu/morphe-youtube/compare/v1.37.0...v1.37.1) (2026-07-20)\n\n### 🐛 Bug Fixes\n\n* **youtube:** read each state field independently so one unreadable field no longer fails the whole call — state threw INTERNAL whenever a video was open, which is exactly when a caller polls it\n* **youtube:** report the failing exception class in INTERNAL replies instead of swallowing it",
-  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.37.1/patches-1.37.1.mpp",
+  "created_at": "2026-07-20T01:20:00",
+  "description": "## [1.38.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.37.1...v1.38.0) (2026-07-20)\n\n### ✨ Features\n\n* **youtube:** add list_suggestions to the Voice Assistant API, returning the related videos for the current video as an ordered list of id, title, channel and duration so they can be chosen by voice",
+  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.38.0/patches-1.38.0.mpp",
   "signature_download_url": "",
-  "version": "1.37.1"
+  "version": "1.38.0"
 }

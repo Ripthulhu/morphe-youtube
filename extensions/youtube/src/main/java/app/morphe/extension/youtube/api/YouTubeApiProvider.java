@@ -26,7 +26,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
@@ -34,8 +37,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.shared.innertube.utils.AuthUtils;
 import app.morphe.extension.youtube.patches.LoadVideoPatch;
 import app.morphe.extension.youtube.patches.VideoInformation;
+import app.morphe.extension.youtube.patches.utils.requests.GetSuggestionsRequest;
 import app.morphe.extension.youtube.shared.PlayerType;
 import app.morphe.extension.youtube.shared.VideoState;
 
@@ -65,6 +70,15 @@ public final class YouTubeApiProvider extends ContentProvider {
     /** Opening a video tears down and rebuilds the player, so it is allowed a longer budget. */
     private static final long OPEN_TIMEOUT_MS = 6_000L;
     private static final long MAIN_THREAD_TIMEOUT_MS = 2_000L;
+    /**
+     * Budget for the one operation here that goes to the network. Same discipline as the others:
+     * a provider call runs on the caller's binder thread, so this must return with an error rather
+     * than block indefinitely on a slow or absent network.
+     */
+    private static final long SUGGESTIONS_TIMEOUT_MS = 5_000L;
+
+    private static final int DEFAULT_SUGGESTION_LIMIT = 5;
+    private static final int MAX_SUGGESTION_LIMIT = 20;
 
     private static final float MIN_SPEED = 0.05f;
     private static final float MAX_SPEED = 8.0f;
@@ -117,6 +131,9 @@ public final class YouTubeApiProvider extends ContentProvider {
                 case "volume":
                     result = volume(extras);
                     break;
+                case "list_suggestions":
+                    result = listSuggestions(extras);
+                    break;
                 default:
                     return failure("VALIDATION", "Unknown method.");
             }
@@ -155,7 +172,7 @@ public final class YouTubeApiProvider extends ContentProvider {
         result.put("api_version", API_VERSION);
         result.put("operations", new JSONArray(Arrays.asList(
                 "capabilities", "state", "open_video", "play", "pause",
-                "next", "previous", "seek", "set_speed", "volume")));
+                "next", "previous", "seek", "set_speed", "volume", "list_suggestions")));
 
         JSONObject fields = new JSONObject();
         fields.put("video_id", true);
@@ -182,6 +199,13 @@ public final class YouTubeApiProvider extends ContentProvider {
         notes.put("verified_mutations", true);
         notes.put("verify_timeout_ms", VERIFY_TIMEOUT_MS);
         notes.put("open_timeout_ms", OPEN_TIMEOUT_MS);
+        // Every other operation here is a local read or a media-key dispatch. list_suggestions is
+        // the exception: it performs a network call to InnerTube, so callers should expect latency
+        // (a cold call typically takes a second or more) and must not treat it as instant.
+        notes.put("list_suggestions_network", true);
+        notes.put("list_suggestions_timeout_ms", SUGGESTIONS_TIMEOUT_MS);
+        notes.put("list_suggestions_default_limit", DEFAULT_SUGGESTION_LIMIT);
+        notes.put("list_suggestions_max_limit", MAX_SUGGESTION_LIMIT);
         result.put("notes", notes);
         return result;
     }
@@ -246,18 +270,28 @@ public final class YouTubeApiProvider extends ContentProvider {
 
     /** Puts one field, degrading to null and a note in [unavailable] rather than failing the call. */
     private void putSafe(JSONObject result, JSONArray unavailable, String name, FieldReader reader) {
+        putSafeNamed(result, unavailable, name, name, reader);
+    }
+
+    /**
+     * As {@link #putSafe}, but the name recorded in [unavailable] can differ from the JSON key.
+     * Needed for list elements, where three suggestions each losing a "title" would otherwise be
+     * reported as an indistinguishable "title" three times.
+     */
+    private void putSafeNamed(JSONObject result, JSONArray unavailable, String key,
+                              String reportedName, FieldReader reader) {
         Object value;
         try {
             value = reader.read();
         } catch (Throwable error) {
-            Logger.printDebug(() -> "YouTube API state field '" + name + "' unreadable: " + error);
-            unavailable.put(name);
+            Logger.printDebug(() -> "YouTube API field '" + reportedName + "' unreadable: " + error);
+            unavailable.put(reportedName);
             value = JSONObject.NULL;
         }
         try {
-            result.put(name, value);
+            result.put(key, value);
         } catch (JSONException error) {
-            unavailable.put(name);
+            unavailable.put(reportedName);
         }
     }
 
@@ -469,6 +503,97 @@ public final class YouTubeApiProvider extends ContentProvider {
         return result;
     }
 
+    /**
+     * Related videos for the current (or an explicitly named) video.
+     *
+     * <p>This is the only operation that touches the network, so unlike the local reads it is
+     * bounded by {@link #SUGGESTIONS_TIMEOUT_MS} and reports a timeout as UNAVAILABLE rather than
+     * as an empty list — "there is nothing to suggest" and "we could not find out" are different
+     * answers, and a voice caller reading the second aloud as the first would be lying.</p>
+     *
+     * <p>Fields degrade individually via {@link #putSafe}: the title/channel split in the upstream
+     * response is positional and unnamed, so a missing channel must cost that field only.</p>
+     */
+    private JSONObject listSuggestions(Bundle extras) throws Exception {
+        String requested = optionalString(extras, "video_id", null);
+        if (requested != null && !VIDEO_ID_PATTERN.matcher(requested).matches()) {
+            throw validation("Invalid video_id.");
+        }
+
+        final String sourceVideoId;
+        if (requested != null) {
+            sourceVideoId = requested;
+        } else {
+            String current = VideoInformation.getVideoId();
+            if (current == null || current.isEmpty()) {
+                throw validation("No video is playing; supply video_id to list suggestions for a "
+                        + "specific video.");
+            }
+            sourceVideoId = current;
+        }
+
+        int limit = DEFAULT_SUGGESTION_LIMIT;
+        if (has(extras, "limit")) {
+            limit = requiredInt(extras, "limit");
+            // A voice caller reads these aloud, so an unbounded list is unusable rather than
+            // merely large.
+            if (limit < 1 || limit > MAX_SUGGESTION_LIMIT) {
+                throw validation("Invalid limit; expected 1 to " + MAX_SUGGESTION_LIMIT + ".");
+            }
+        }
+
+        Map<String, String> requestHeader;
+        try {
+            // Auth is optional for the next endpoint: signed-out still returns results, signed-in
+            // returns personalised ones. Never fail the call over a missing header.
+            requestHeader = AuthUtils.getRequestHeader();
+        } catch (Throwable error) {
+            Logger.printDebug(() -> "YouTube API suggestions auth headers unavailable: " + error);
+            requestHeader = Collections.emptyMap();
+        }
+
+        List<GetSuggestionsRequest.Suggestion> suggestions =
+                GetSuggestionsRequest.fetchRequestIfNeeded(sourceVideoId, requestHeader)
+                        .getSuggestions(SUGGESTIONS_TIMEOUT_MS);
+        if (suggestions == null) {
+            // The failed request is cached by video id, so drop it rather than pinning the failure
+            // for the lifetime of the process.
+            GetSuggestionsRequest.clear();
+            throw unavailable("Suggestions for " + sourceVideoId + " could not be fetched within "
+                    + SUGGESTIONS_TIMEOUT_MS + "ms; the request failed or timed out.");
+        }
+
+        JSONObject result = new JSONObject();
+        JSONArray unavailable = new JSONArray();
+        result.put("video_id", sourceVideoId);
+
+        JSONArray array = new JSONArray();
+        final int count = Math.min(limit, suggestions.size());
+        for (int i = 0; i < count; i++) {
+            GetSuggestionsRequest.Suggestion suggestion = suggestions.get(i);
+            JSONObject entry = new JSONObject();
+            // 1-based: this is read aloud, and people count from one.
+            entry.put("index", i + 1);
+            entry.put("video_id", suggestion.videoId);
+            // Named by position so the caller can tell WHICH suggestion lost a field; a bare
+            // "title" repeated three times would be useless.
+            final String prefix = "suggestions[" + (i + 1) + "].";
+            // A null here is a parse miss, not a legitimate "no value", so it is reported as
+            // unavailable rather than silently emitted as null.
+            putSafeNamed(entry, unavailable, "title", prefix + "title",
+                    () -> parsed(suggestion.title, "title"));
+            putSafeNamed(entry, unavailable, "channel", prefix + "channel",
+                    () -> parsed(suggestion.channel, "channel"));
+            putSafeNamed(entry, unavailable, "duration", prefix + "duration",
+                    () -> parsed(suggestion.duration, "duration"));
+            array.put(entry);
+        }
+        result.put("suggestions", array);
+        result.put("total_available", suggestions.size());
+        result.put("unavailable", unavailable);
+        return result;
+    }
+
     // endregion
 
     // region playback plumbing
@@ -666,6 +791,17 @@ public final class YouTubeApiProvider extends ContentProvider {
         if (value instanceof Double) return ((Double) value).floatValue();
         if (value instanceof Integer) return ((Integer) value).floatValue();
         throw validation("Invalid " + key + ".");
+    }
+
+    /**
+     * Asserts a field was actually parsed out of the upstream response. Throwing here routes the
+     * miss through {@link #putSafeNamed}, so the field lands as null AND is named in `unavailable`.
+     */
+    private static Object parsed(String value, String field) {
+        if (value == null || value.isEmpty()) {
+            throw new IllegalStateException("no " + field + " in lockup");
+        }
+        return value;
     }
 
     private static Object nullIfEmpty(String value) {

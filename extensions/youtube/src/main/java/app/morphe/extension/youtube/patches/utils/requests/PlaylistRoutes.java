@@ -9,6 +9,8 @@ package app.morphe.extension.youtube.patches.utils.requests;
 
 import android.os.Build;
 
+import androidx.annotation.Nullable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,10 +29,23 @@ public final class PlaylistRoutes {
 
     private static final String YT_API_URL = "https://youtubei.googleapis.com/youtubei/v1/";
 
+    /**
+     * The web InnerTube host. The {@code next} endpoint must be reached through this host with a
+     * WEB client context; see {@link #GET_WATCH_NEXT}.
+     */
+    private static final String YT_WEB_API_URL = "https://www.youtube.com/youtubei/v1/";
+
     private static final int CLIENT_ID = 3;
     private static final String CLIENT_NAME = "ANDROID";
     private static final String CLIENT_VERSION = "20.26.46";
     private static final String PACKAGE_NAME = "com.google.android.youtube";
+
+    private static final int WEB_CLIENT_ID = 1;
+    private static final String WEB_CLIENT_NAME = "WEB";
+    private static final String WEB_CLIENT_VERSION = "2.20240726.00.00";
+    private static final String WEB_USER_AGENT =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                    + "Chrome/126.0.0.0 Safari/537.36";
 
     private static final int CONNECTION_TIMEOUT_MILLISECONDS = 10 * 1000;
 
@@ -63,6 +78,21 @@ public final class PlaylistRoutes {
                     "watchEndpoint.watchEndpoint.playerParams&prettyPrint=false"
     ).compile();
 
+    /**
+     * Related/suggested videos for a watch page.
+     *
+     * <p>Deliberately unmasked. {@link #GET_MIX_PLAYLIST} points at the same {@code next} endpoint
+     * but carries a {@code ?fields=} mask that keeps only the playlist panel, which strips the
+     * secondary results entirely — it cannot be reused here.</p>
+     *
+     * <p>Must be sent with the WEB client context ({@link #webContext()}). The ANDROID context
+     * returns the related shelf as Litho {@code elementRenderer} blobs with no parseable video
+     * metadata at all; the WEB context returns {@code lockupViewModel} entries.</p>
+     */
+    public static final Route.CompiledRoute GET_WATCH_NEXT = new Route(
+            Route.Method.POST, "next?prettyPrint=false"
+    ).compile();
+
     private PlaylistRoutes() {
     }
 
@@ -82,6 +112,40 @@ public final class PlaylistRoutes {
         JSONObject context = new JSONObject();
         context.put("client", client);
         return context;
+    }
+
+    /**
+     * WEB client context. Kept separate from {@link #androidContext()} rather than parameterised,
+     * because the two are not interchangeable: device fields are meaningless for WEB, and the
+     * response shape differs (lockupViewModel vs elementRenderer).
+     */
+    private static JSONObject webContext() throws JSONException {
+        JSONObject client = new JSONObject();
+        client.put("clientName", WEB_CLIENT_NAME);
+        client.put("clientVersion", WEB_CLIENT_VERSION);
+        Locale localeDefault = Locale.getDefault();
+        String language = localeDefault.getLanguage();
+        String country = localeDefault.getCountry();
+        client.put("hl", language.isEmpty() ? "en" : language);
+        client.put("gl", country.isEmpty() ? "US" : country);
+
+        JSONObject context = new JSONObject();
+        context.put("client", client);
+        return context;
+    }
+
+    public static byte[] getWatchNextBody(String videoId) {
+        try {
+            JSONObject body = new JSONObject();
+            body.put("context", webContext());
+            body.put("videoId", videoId);
+            body.put("contentCheckOk", true);
+            body.put("racyCheckOk", true);
+            return body.toString().getBytes(StandardCharsets.UTF_8);
+        } catch (JSONException ex) {
+            Logger.printException(() -> "getWatchNextBody failed", ex);
+        }
+        return new byte[0];
     }
 
     private static JSONObject getBaseContentJson() throws JSONException {
@@ -194,6 +258,41 @@ public final class PlaylistRoutes {
             Logger.printException(() -> "savePlaylistBody failed", ex);
         }
         return new byte[0];
+    }
+
+    /**
+     * Connection for routes that require the WEB client, notably {@link #GET_WATCH_NEXT}.
+     *
+     * <p>The client-name header must be {@code 1} (WEB) and must agree with the clientName in the
+     * body context; a mismatch makes YouTube fall back to a different response shape. The
+     * X-GOOG-API-FORMAT-VERSION header used by the android connection is deliberately not sent.</p>
+     *
+     * <p>Auth headers are optional here — signed-out requests still return results, signed-in ones
+     * are personalised — so an empty or null map is passed through without complaint.</p>
+     */
+    public static HttpURLConnection getWebConnection(Route.CompiledRoute route, Map<String, String> authHeaders) throws IOException {
+        HttpURLConnection connection = Requester.getConnectionFromCompiledRoute(YT_WEB_API_URL, route);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("User-Agent", WEB_USER_AGENT);
+        connection.setRequestProperty("X-YouTube-Client-Name", String.valueOf(WEB_CLIENT_ID));
+        connection.setRequestProperty("X-YouTube-Client-Version", WEB_CLIENT_VERSION);
+        connection.setUseCaches(false);
+        connection.setDoOutput(true);
+        connection.setConnectTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
+        connection.setReadTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
+
+        applyAuthHeaders(connection, authHeaders);
+        return connection;
+    }
+
+    private static void applyAuthHeaders(HttpURLConnection connection, @Nullable Map<String, String> authHeaders) {
+        if (authHeaders == null) return;
+        for (Map.Entry<String, String> entry : authHeaders.entrySet()) {
+            String value = entry.getValue();
+            if (value != null && !value.isEmpty()) {
+                connection.setRequestProperty(entry.getKey(), value);
+            }
+        }
     }
 
     public static HttpURLConnection getConnection(Route.CompiledRoute route, Map<String, String> authHeaders) throws IOException {

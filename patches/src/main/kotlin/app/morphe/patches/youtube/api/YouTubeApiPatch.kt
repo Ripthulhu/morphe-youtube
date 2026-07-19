@@ -1,6 +1,7 @@
 package app.morphe.patches.youtube.api
 
 import app.morphe.patcher.patch.resourcePatch
+import app.morphe.patches.youtube.misc.auth.authHookPatch
 import app.morphe.patches.youtube.misc.extension.sharedExtensionPatch
 import app.morphe.patches.youtube.shared.Constants.COMPATIBILITY_YOUTUBE
 import org.w3c.dom.Element
@@ -18,7 +19,14 @@ val youtubeApiPatch = resourcePatch(
     default = false,
 ) {
     compatibleWith(COMPATIBILITY_YOUTUBE)
-    dependsOn(sharedExtensionPatch)
+    dependsOn(
+        sharedExtensionPatch,
+        // list_suggestions calls InnerTube. Auth is OPTIONAL there — signed-out requests still
+        // return related videos — but without this hook AuthUtils never receives the account
+        // headers, so every result would be the generic signed-out set. Not reached transitively
+        // through sharedExtensionPatch.
+        authHookPatch,
+    )
 
     execute {
         document("AndroidManifest.xml").use { document ->
