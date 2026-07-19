@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.view.KeyEvent;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
@@ -127,7 +128,12 @@ public final class YouTubeApiProvider extends ContentProvider {
         } catch (Exception exception) {
             Logger.printDebug(() -> "YouTube API operation failed: "
                     + exception.getClass().getSimpleName());
-            return failure("INTERNAL", "YouTube API operation failed.");
+            // The class name goes in the reply, not just the log. Logger.printDebug only emits when
+            // Morphe's debug logging is enabled, so an INTERNAL reaching the caller was previously
+            // an opaque dead end — the caller could see that something failed and never what. The
+            // caller is an allowlisted app, so there is nobody to leak this to.
+            return failure("INTERNAL", "YouTube API operation failed: "
+                    + exception.getClass().getSimpleName());
         }
     }
 
@@ -180,32 +186,79 @@ public final class YouTubeApiProvider extends ContentProvider {
         return result;
     }
 
+    /**
+     * Reads every field independently, so one unreadable field cannot empty the whole reply.
+     *
+     * This was originally a straight sequence of puts, and any single throw turned the entire call
+     * into INTERNAL. That is precisely backwards for a state read: the caller polls this to decide
+     * whether the video it asked for is playing, and losing `video_id` because `speed` was
+     * unreadable makes a working player indistinguishable from a broken one. Observed on device —
+     * state succeeded while nothing was playing and failed once a video opened, which is the one
+     * moment the answer matters.
+     *
+     * Fields that cannot be read are reported as null and named in `unavailable`, so a caller can
+     * tell "not playing" from "could not tell".
+     */
     private JSONObject state() throws Exception {
         JSONObject result = new JSONObject();
-        String videoId = VideoInformation.getVideoId();
-        result.put("video_id", videoId.isEmpty() ? JSONObject.NULL : videoId);
+        JSONArray unavailable = new JSONArray();
         result.put("title", JSONObject.NULL); // Not available; see capabilities().
-        result.put("channel_id", nullIfEmpty(VideoInformation.getChannelId()));
-        result.put("channel_name", nullIfEmpty(VideoInformation.getChannelName()));
-        result.put("playlist_id", nullIfEmpty(VideoInformation.getPlaylistId()));
 
-        final long position = VideoInformation.getVideoTime();
-        result.put("position_ms", position < 0 ? JSONObject.NULL : position);
-        final long duration = VideoInformation.getVideoLength();
-        result.put("duration_ms", duration > 0 ? duration : JSONObject.NULL);
-        result.put("speed", (double) VideoInformation.getPlaybackSpeed());
+        putSafe(result, unavailable, "video_id", () -> nullIfEmpty(VideoInformation.getVideoId()));
+        putSafe(result, unavailable, "channel_id", () -> nullIfEmpty(VideoInformation.getChannelId()));
+        putSafe(result, unavailable, "channel_name", () -> nullIfEmpty(VideoInformation.getChannelName()));
+        putSafe(result, unavailable, "playlist_id", () -> nullIfEmpty(VideoInformation.getPlaylistId()));
+        putSafe(result, unavailable, "position_ms", () -> {
+            long position = VideoInformation.getVideoTime();
+            return position < 0 ? JSONObject.NULL : position;
+        });
+        putSafe(result, unavailable, "duration_ms", () -> {
+            long duration = VideoInformation.getVideoLength();
+            return duration > 0 ? duration : JSONObject.NULL;
+        });
+        putSafe(result, unavailable, "speed", () -> {
+            // JSONObject rejects NaN and infinity outright, and an uninitialised speed can be
+            // either, so this field alone could take the whole response down.
+            float speed = VideoInformation.getPlaybackSpeed();
+            return (Float.isNaN(speed) || Float.isInfinite(speed)) ? JSONObject.NULL : (double) speed;
+        });
+        putSafe(result, unavailable, "video_state", () -> {
+            VideoState videoState = VideoState.getCurrent();
+            return videoState == null ? JSONObject.NULL : videoState.name();
+        });
+        putSafe(result, unavailable, "playing", () -> VideoState.getCurrent() == VideoState.PLAYING);
+        putSafe(result, unavailable, "at_end", VideoInformation::isAtEndOfVideo);
+        putSafe(result, unavailable, "music_active", this::isMusicActive);
+        putSafe(result, unavailable, "is_short", VideoInformation::lastVideoIdIsShort);
+        putSafe(result, unavailable, "player_type", () -> {
+            PlayerType playerType = PlayerType.getCurrent();
+            return playerType == null ? JSONObject.NULL : playerType.name();
+        });
+        putSafe(result, unavailable, "volume", this::volumePercent);
 
-        VideoState videoState = VideoState.getCurrent();
-        result.put("video_state", videoState == null ? JSONObject.NULL : videoState.name());
-        result.put("playing", videoState == VideoState.PLAYING);
-        result.put("at_end", VideoInformation.isAtEndOfVideo());
-        result.put("music_active", isMusicActive());
-        result.put("is_short", VideoInformation.lastVideoIdIsShort());
-
-        PlayerType playerType = PlayerType.getCurrent();
-        result.put("player_type", playerType == null ? JSONObject.NULL : playerType.name());
-        result.put("volume", volumePercent());
+        result.put("unavailable", unavailable);
         return result;
+    }
+
+    private interface FieldReader {
+        Object read() throws Exception;
+    }
+
+    /** Puts one field, degrading to null and a note in [unavailable] rather than failing the call. */
+    private void putSafe(JSONObject result, JSONArray unavailable, String name, FieldReader reader) {
+        Object value;
+        try {
+            value = reader.read();
+        } catch (Throwable error) {
+            Logger.printDebug(() -> "YouTube API state field '" + name + "' unreadable: " + error);
+            unavailable.put(name);
+            value = JSONObject.NULL;
+        }
+        try {
+            result.put(name, value);
+        } catch (JSONException error) {
+            unavailable.put(name);
+        }
     }
 
     private JSONObject openVideo(Bundle extras) throws Exception {

@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-19T22:34:00",
-  "description": "## [1.37.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.36.2...v1.37.0) (2026-07-19)\n\n### ✨ Features\n\n* **youtube:** add authenticated Voice Assistant YouTube API provider with verified playback control and now-playing state\n* **music:** add authenticated Voice Assistant YouTube Music API provider with verified transport and volume control\n\n### 🐛 Bug Fixes\n\n* **keep:** point the caller allowlist at app.ripthulhu.voiceassistant and log refused callers",
-  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.37.0/patches-1.37.0.mpp",
+  "created_at": "2026-07-20T00:15:00",
+  "description": "## [1.37.1](https://github.com/Ripthulhu/morphe-youtube/compare/v1.37.0...v1.37.1) (2026-07-20)\n\n### 🐛 Bug Fixes\n\n* **youtube:** read each state field independently so one unreadable field no longer fails the whole call — state threw INTERNAL whenever a video was open, which is exactly when a caller polls it\n* **youtube:** report the failing exception class in INTERNAL replies instead of swallowing it",
+  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.37.1/patches-1.37.1.mpp",
   "signature_download_url": "",
-  "version": "1.37.0"
+  "version": "1.37.1"
 }
