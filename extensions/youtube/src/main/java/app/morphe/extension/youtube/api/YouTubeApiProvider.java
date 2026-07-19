@@ -542,18 +542,19 @@ public final class YouTubeApiProvider extends ContentProvider {
             }
         }
 
-        Map<String, String> requestHeader;
-        try {
-            // Auth is optional for the next endpoint: signed-out still returns results, signed-in
-            // returns personalised ones. Never fail the call over a missing header.
-            requestHeader = AuthUtils.getRequestHeader();
-        } catch (Throwable error) {
-            Logger.printDebug(() -> "YouTube API suggestions auth headers unavailable: " + error);
-            requestHeader = Collections.emptyMap();
-        }
-
+        // Sent anonymously, deliberately. AuthUtils holds credentials issued for the ANDROID client
+        // this app runs as, but the suggestions request has to use a WEB client context — the
+        // ANDROID context returns the related shelf as opaque Litho element blobs with no video ids
+        // in them, measured as 87 elementRenderer and zero parseable renderers. Presenting ANDROID
+        // credentials against a WEB context is what the endpoint rejected with HTTP 400 on device;
+        // the identical request without them returns 200.
+        //
+        // The cost is that suggestions are not personalised. That is acceptable here because this
+        // list was never going to match the on-screen one anyway — it is a separate query from the
+        // one the app rendered with — so the caller is expected to read its list aloud and let the
+        // user choose from what they heard, rather than implying screen correspondence.
         List<GetSuggestionsRequest.Suggestion> suggestions =
-                GetSuggestionsRequest.fetchRequestIfNeeded(sourceVideoId, requestHeader)
+                GetSuggestionsRequest.fetchRequestIfNeeded(sourceVideoId, Collections.emptyMap())
                         .getSuggestions(SUGGESTIONS_TIMEOUT_MS);
         if (suggestions == null) {
             // The failed request is cached by video id, so drop it rather than pinning the failure

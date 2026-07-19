@@ -1,7 +1,7 @@
 {
   "created_at": "2026-07-20T01:20:00",
-  "description": "## [1.38.0](https://github.com/Ripthulhu/morphe-youtube/compare/v1.37.1...v1.38.0) (2026-07-20)\n\n### ✨ Features\n\n* **youtube:** add list_suggestions to the Voice Assistant API, returning the related videos for the current video as an ordered list of id, title, channel and duration so they can be chosen by voice",
-  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.38.0/patches-1.38.0.mpp",
+  "description": "## [1.38.1](https://github.com/Ripthulhu/morphe-youtube/compare/v1.37.1...v1.38.1) (2026-07-20)\n\n### 🐛 Bug Fixes\n\n* **youtube:** send the suggestions request anonymously — ANDROID client credentials against the required WEB client context were rejected with HTTP 400 on device",
+  "download_url": "https://github.com/Ripthulhu/morphe-youtube/releases/download/v1.38.1/patches-1.38.1.mpp",
   "signature_download_url": "",
-  "version": "1.38.0"
+  "version": "1.38.1"
 }
